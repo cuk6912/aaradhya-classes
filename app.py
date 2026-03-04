@@ -1,9 +1,12 @@
-from flask import Flask, render_template, request, redirect
-from models import db, Student
+from flask import Flask, render_template, request, redirect, session
+from models import db, Student, User
 import os
 from datetime import date
 
 app = Flask(__name__)
+
+app.secret_key = "aaradhya_secret"
+
 
 database_url = os.getenv("DATABASE_URL")
 
@@ -21,26 +24,50 @@ db.init_app(app)
 with app.app_context():
     db.create_all()
 
+    # Create default admin if not exists
+    if not User.query.filter_by(username="admin").first():
+        admin = User(username="admin", password="admin123", role="admin")
+        db.session.add(admin)
+        db.session.commit()
+
+
+# ---------------- LOGIN ----------------
+
+@app.route("/login", methods=["GET","POST"])
+def login():
+
+    if request.method == "POST":
+
+        username = request.form["username"]
+        password = request.form["password"]
+
+        user = User.query.filter_by(username=username,password=password).first()
+
+        if user:
+
+            session["user"] = user.username
+            session["role"] = user.role
+
+            return redirect("/")
+
+    return render_template("login.html")
+
+
+@app.route("/logout")
+def logout():
+
+    session.clear()
+
+    return redirect("/login")
+
+
+# ---------------- DASHBOARD ----------------
 
 @app.route("/")
 def dashboard():
 
-    students = Student.query.filter_by(leave_date=None).all()
-
-    total_students = len(students)
-
-    total_revenue = sum([s.monthly_fee for s in students]) if students else 0
-
-    classes = set([s.student_class for s in students])
-    subjects = set([s.subject for s in students])
-
-    return render_template(
-        "dashboard.html",
-        total_students=total_students,
-        total_revenue=total_revenue,
-        total_classes=len(classes),
-        total_subjects=len(subjects)
-    )
+    if "user" not in session:
+        return redirect("/login")
 
     students = Student.query.filter_by(leave_date=None).all()
 
@@ -59,9 +86,14 @@ def dashboard():
         total_subjects=len(subjects)
     )
 
+
+# ---------------- STUDENTS ----------------
 
 @app.route("/students")
 def students():
+
+    if "user" not in session:
+        return redirect("/login")
 
     active_students = Student.query.filter_by(leave_date=None).all()
 
@@ -104,6 +136,8 @@ def leave_student(id):
     return redirect("/students")
 
 
+# ---------------- OTHER MODULES ----------------
+
 @app.route("/teachers")
 def teachers():
     return render_template("teachers.html")
@@ -127,16 +161,7 @@ def fees():
 @app.route("/reports")
 def reports():
     return render_template("reports.html")
-@app.route("/edit_student/<int:id>")
-def edit_student(id):
 
-    student = Student.query.get(id)
-
-    return f"""
-    <h2>Edit Student</h2>
-    <p>Editing: {student.name}</p>
-    <a href='/students'>Back</a>
-    """
 
 if __name__ == "__main__":
     app.run()
