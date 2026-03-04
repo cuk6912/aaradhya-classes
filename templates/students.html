@@ -1,5 +1,4 @@
 {% extends "layout.html" %}
-
 {% block content %}
 
 <h2 class="mb-4">Student Management</h2>
@@ -7,11 +6,11 @@
 <div class="card shadow-sm mb-4">
 <div class="card-body">
 
-<h5 class="mb-3">Add Student</h5>
+<h5>Add Student</h5>
 
 <form method="POST" action="/add_student">
 
-<div class="row">
+<div class="row g-3">
 
 <div class="col-md-3">
 <label>Name</label>
@@ -72,13 +71,16 @@
 </div>
 
 
-
 <div class="card shadow-sm">
 <div class="card-body">
 
+<div class="d-flex justify-content-between mb-3">
 <h5>Active Students</h5>
 
-<table class="table table-striped">
+<input type="text" id="searchStudent" class="form-control w-25" placeholder="Search student...">
+</div>
+
+<table class="table table-striped" id="studentTable">
 
 <thead>
 <tr>
@@ -87,8 +89,8 @@
 <th>Subject</th>
 <th>Phone</th>
 <th>Fee</th>
-<th>Join Date</th>
-<th>Leave</th>
+<th>Join</th>
+<th>Actions</th>
 </tr>
 </thead>
 
@@ -105,9 +107,13 @@
 <td>{{s.join_date}}</td>
 
 <td>
-<form method="POST" action="/leave_student/{{s.id}}">
+
+<a href="/edit_student/{{s.id}}" class="btn btn-sm btn-warning">Edit</a>
+
+<form method="POST" action="/leave_student/{{s.id}}" style="display:inline;">
 <button class="btn btn-sm btn-danger">Leave</button>
 </form>
+
 </td>
 
 </tr>
@@ -120,7 +126,6 @@
 
 </div>
 </div>
-
 
 
 <div class="card shadow-sm mt-4">
@@ -160,5 +165,21 @@
 
 </div>
 </div>
+
+
+<script>
+document.getElementById("searchStudent").addEventListener("keyup", function(){
+
+var filter = this.value.toLowerCase();
+var rows = document.querySelectorAll("#studentTable tbody tr");
+
+rows.forEach(row => {
+
+row.style.display = row.innerText.toLowerCase().includes(filter) ? "" : "none";
+
+});
+
+});
+</script>
 
 {% endblock %}
