@@ -15,3 +15,7 @@ class Student(db.Model):
     phone = db.Column(db.String(20))
 
     monthly_fee = db.Column(db.Integer)
+
+    join_date = db.Column(db.String(20))
+
+    leave_date = db.Column(db.String(20))
