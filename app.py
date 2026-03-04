@@ -4,11 +4,16 @@ from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 
-# Fix Railway PostgreSQL URL
+# Get Railway database URL
 DATABASE_URL = os.environ.get("DATABASE_URL")
 
+# If Railway gives postgres:// fix it
 if DATABASE_URL and DATABASE_URL.startswith("postgres://"):
     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql+psycopg2://", 1)
+
+# If database not available use SQLite fallback
+if not DATABASE_URL:
+    DATABASE_URL = "sqlite:///local.db"
 
 app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -16,9 +21,9 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
 
 
-# -------------------------------
+# -------------------------
 # Database Model
-# -------------------------------
+# -------------------------
 
 class Student(db.Model):
 
@@ -35,13 +40,12 @@ class Student(db.Model):
     monthly_fee = db.Column(db.Integer)
 
 
-# -------------------------------
+# -------------------------
 # Routes
-# -------------------------------
+# -------------------------
 
 @app.route("/")
 def dashboard():
-
     return render_template("dashboard.html")
 
 
@@ -67,39 +71,31 @@ def add_student():
     fee = request.form["fee"]
 
     new_student = Student(
-
         name=name,
-
         student_class=student_class,
-
         subject=subject,
-
         phone=phone,
-
         monthly_fee=fee
     )
 
     db.session.add(new_student)
-
     db.session.commit()
 
     return redirect("/students")
 
 
-# -------------------------------
-# Create Tables
-# -------------------------------
+# -------------------------
+# Create tables
+# -------------------------
 
 with app.app_context():
     db.create_all()
 
 
-# -------------------------------
-# Run App
-# -------------------------------
+# -------------------------
+# Run server
+# -------------------------
 
 if __name__ == "__main__":
-
     port = int(os.environ.get("PORT", 8080))
-
     app.run(host="0.0.0.0", port=port)
