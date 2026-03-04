@@ -1,64 +1,17 @@
-<!DOCTYPE html>
-<html>
+from flask_sqlalchemy import SQLAlchemy
 
-<head>
-<title>Aaradhya Classes</title>
+db = SQLAlchemy()
 
-<style>
+class Student(db.Model):
 
-body{
-font-family: Arial;
-margin:0;
-}
+    id = db.Column(db.Integer, primary_key=True)
 
-.sidebar{
-width:220px;
-height:100vh;
-background:#2c3e50;
-color:white;
-position:fixed;
-padding:20px;
-}
+    name = db.Column(db.String(100), nullable=False)
 
-.sidebar a{
-display:block;
-color:white;
-text-decoration:none;
-margin:15px 0;
-}
+    student_class = db.Column(db.String(20))
 
-.main{
-margin-left:240px;
-padding:30px;
-}
+    subject = db.Column(db.String(100))
 
-</style>
+    phone = db.Column(db.String(20))
 
-</head>
-
-<body>
-
-<div class="sidebar">
-
-<h2>Aaradhya Classes</h2>
-
-<a href="/">Dashboard</a>
-<a href="/students">Students</a>
-<a href="#">Teachers</a>
-<a href="#">Attendance</a>
-<a href="#">Fees</a>
-<a href="#">Reports</a>
-
-</div>
-
-<div class="main">
-
-<h1>Dashboard</h1>
-
-<p>System running successfully</p>
-
-</div>
-
-</body>
-
-</html>
+    monthly_fee = db.Column(db.Integer)
