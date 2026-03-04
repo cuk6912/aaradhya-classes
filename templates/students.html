@@ -1,10 +1,21 @@
-<h2>Students</h2>
+<h2>Student Management</h2>
 
 <form method="POST" action="/add_student">
 
-Name <input name="name"><br>
-Class <input name="class"><br>
-Phone <input name="phone"><br>
+Name
+<input name="name"><br><br>
+
+Class
+<input name="class"><br><br>
+
+Subject
+<input name="subject"><br><br>
+
+Phone
+<input name="phone"><br><br>
+
+Monthly Fee
+<input name="fee"><br><br>
 
 <button>Add Student</button>
 
@@ -12,8 +23,16 @@ Phone <input name="phone"><br>
 
 <hr>
 
+<h3>Student List</h3>
+
 {% for s in students %}
 
-{{s.name}} | {{s.student_class}} | {{s.phone}} <br>
+{{s.name}} |
+{{s.student_class}} |
+{{s.subject}} |
+{{s.phone}} |
+₹{{s.monthly_fee}}
+
+<br>
 
 {% endfor %}
