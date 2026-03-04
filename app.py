@@ -4,13 +4,21 @@ from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 
-# PostgreSQL connection from Railway
-app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL")
+# Fix Railway PostgreSQL URL
+DATABASE_URL = os.environ.get("DATABASE_URL")
 
+if DATABASE_URL and DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql+psycopg2://", 1)
+
+app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
 
+
+# -------------------------------
+# Database Model
+# -------------------------------
 
 class Student(db.Model):
 
@@ -27,8 +35,13 @@ class Student(db.Model):
     monthly_fee = db.Column(db.Integer)
 
 
+# -------------------------------
+# Routes
+# -------------------------------
+
 @app.route("/")
 def dashboard():
+
     return render_template("dashboard.html")
 
 
@@ -73,10 +86,20 @@ def add_student():
     return redirect("/students")
 
 
+# -------------------------------
+# Create Tables
+# -------------------------------
+
 with app.app_context():
     db.create_all()
 
 
+# -------------------------------
+# Run App
+# -------------------------------
+
 if __name__ == "__main__":
+
     port = int(os.environ.get("PORT", 8080))
+
     app.run(host="0.0.0.0", port=port)
