@@ -2,20 +2,25 @@
 
 {% block content %}
 
-<h1>Students</h1>
+<h2 class="mb-4">Student Management</h2>
 
-<div class="card">
+<div class="card shadow mb-4">
+<div class="card-body">
 
-<h3>Add Student</h3>
+<h5>Add Student</h5>
 
 <form method="POST" action="/add_student">
 
-Name<br>
-<input name="name" required><br><br>
+<div class="row">
 
-Class<br>
-<select name="class">
+<div class="col-md-4">
+<label>Name</label>
+<input class="form-control" name="name" required>
+</div>
 
+<div class="col-md-2">
+<label>Class</label>
+<select class="form-control" name="class">
 <option>1st</option>
 <option>2nd</option>
 <option>3rd</option>
@@ -28,35 +33,53 @@ Class<br>
 <option>10th</option>
 <option>11th</option>
 <option>12th</option>
+</select>
+</div>
 
-</select><br><br>
-
-Subject<br>
-<select name="subject">
-
+<div class="col-md-3">
+<label>Subject</label>
+<select class="form-control" name="subject">
 <option>All Subjects</option>
 <option>Phonics</option>
 <option>Abacus</option>
+</select>
+</div>
 
-</select><br><br>
+<div class="col-md-3">
+<label>Phone</label>
+<input class="form-control" name="phone">
+</div>
 
-Phone<br>
-<input name="phone"><br><br>
+</div>
 
-Monthly Fee<br>
-<input name="fee"><br><br>
+<br>
 
-<button type="submit">Add Student</button>
+<div class="row">
+
+<div class="col-md-3">
+<label>Monthly Fee</label>
+<input class="form-control" name="fee">
+</div>
+
+<div class="col-md-2">
+<br>
+<button class="btn btn-primary">Add Student</button>
+</div>
+
+</div>
 
 </form>
 
 </div>
+</div>
 
-<div class="card">
+<div class="card shadow">
 
-<h3>Student List</h3>
+<div class="card-body">
 
-<table>
+<h5>Student List</h5>
+
+<table class="table table-striped">
 
 <tr>
 <th>Name</th>
@@ -73,12 +96,14 @@ Monthly Fee<br>
 <td>{{s.student_class}}</td>
 <td>{{s.subject}}</td>
 <td>{{s.phone}}</td>
-<td>{{s.monthly_fee}}</td>
+<td>₹{{s.monthly_fee}}</td>
 </tr>
 
 {% endfor %}
 
 </table>
+
+</div>
 
 </div>
 
