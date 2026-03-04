@@ -4,19 +4,20 @@ import os
 
 app = Flask(__name__)
 
-# Railway PostgreSQL connection
-app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")
+database_url = os.getenv("DATABASE_URL")
+
+if database_url and database_url.startswith("postgres://"):
+    database_url = database_url.replace("postgres://", "postgresql://", 1)
+
+app.config["SQLALCHEMY_DATABASE_URI"] = database_url
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db.init_app(app)
 
-
-# Create tables automatically
 with app.app_context():
     db.create_all()
 
 
-# Dashboard
 @app.route("/")
 def dashboard():
 
@@ -38,7 +39,6 @@ def dashboard():
     )
 
 
-# Student Page
 @app.route("/students")
 def students():
 
@@ -47,7 +47,6 @@ def students():
     return render_template("students.html", students=students)
 
 
-# Add Student
 @app.route("/add_student", methods=["POST"])
 def add_student():
 
@@ -71,6 +70,5 @@ def add_student():
     return redirect("/students")
 
 
-# Run locally
 if __name__ == "__main__":
     app.run(debug=True)
