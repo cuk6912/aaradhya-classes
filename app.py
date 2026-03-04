@@ -42,6 +42,23 @@ def dashboard():
         total_subjects=len(subjects)
     )
 
+    students = Student.query.filter_by(leave_date=None).all()
+
+    total_students = len(students)
+
+    total_revenue = sum([s.monthly_fee for s in students]) if students else 0
+
+    classes = set([s.student_class for s in students])
+    subjects = set([s.subject for s in students])
+
+    return render_template(
+        "dashboard.html",
+        total_students=total_students,
+        total_revenue=total_revenue,
+        total_classes=len(classes),
+        total_subjects=len(subjects)
+    )
+
 
 @app.route("/students")
 def students():
