@@ -4,44 +4,102 @@
 
 <h2 class="mb-4">Dashboard</h2>
 
+<div class="row mb-4">
+
+<div class="col-md-3">
+<div class="card shadow-sm">
+<div class="card-body text-center">
+<h5>Total Students</h5>
+<h3>{{total_students}}</h3>
+</div>
+</div>
+</div>
+
+<div class="col-md-3">
+<div class="card shadow-sm">
+<div class="card-body text-center">
+<h5>Monthly Revenue</h5>
+<h3>₹ {{total_revenue}}</h3>
+</div>
+</div>
+</div>
+
+<div class="col-md-3">
+<div class="card shadow-sm">
+<div class="card-body text-center">
+<h5>Classes</h5>
+<h3>{{total_classes}}</h3>
+</div>
+</div>
+</div>
+
+<div class="col-md-3">
+<div class="card shadow-sm">
+<div class="card-body text-center">
+<h5>Subjects</h5>
+<h3>{{total_subjects}}</h3>
+</div>
+</div>
+</div>
+
+</div>
+
+
 <div class="row">
 
-<div class="col-md-3">
-<div class="card shadow-sm border-0 bg-primary text-white">
+<div class="col-md-6">
+<div class="card shadow-sm">
 <div class="card-body">
-<h6>Total Students</h6>
-<h2>{{ total_students }}</h2>
+<h5>Revenue Chart</h5>
+<canvas id="revenueChart"></canvas>
 </div>
 </div>
 </div>
 
-<div class="col-md-3">
-<div class="card shadow-sm border-0 bg-success text-white">
+<div class="col-md-6">
+<div class="card shadow-sm">
 <div class="card-body">
-<h6>Monthly Revenue</h6>
-<h2>₹ {{ total_revenue }}</h2>
-</div>
-</div>
-</div>
-
-<div class="col-md-3">
-<div class="card shadow-sm border-0 bg-warning text-white">
-<div class="card-body">
-<h6>Classes Running</h6>
-<h2>{{ total_classes }}</h2>
-</div>
-</div>
-</div>
-
-<div class="col-md-3">
-<div class="card shadow-sm border-0 bg-info text-white">
-<div class="card-body">
-<h6>Subjects</h6>
-<h2>{{ total_subjects }}</h2>
+<h5>Student Distribution</h5>
+<canvas id="studentChart"></canvas>
 </div>
 </div>
 </div>
 
 </div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+
+const revenueChart = new Chart(
+document.getElementById('revenueChart'),
+{
+type: 'bar',
+data: {
+labels: ['Students'],
+datasets: [{
+label: 'Monthly Revenue',
+data: [{{total_revenue}}],
+}]
+}
+}
+);
+
+
+const studentChart = new Chart(
+document.getElementById('studentChart'),
+{
+type: 'doughnut',
+data: {
+labels: ['Students'],
+datasets: [{
+data: [{{total_students}}],
+}]
+}
+}
+);
+
+</script>
 
 {% endblock %}
