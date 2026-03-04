@@ -1,4 +1,10 @@
-<h2>Student Management</h2>
+{% extends "layout.html" %}
+
+{% block content %}
+
+<h1>Students</h1>
+
+<div class="card">
 
 <h3>Add Student</h3>
 
@@ -9,6 +15,7 @@ Name<br>
 
 Class<br>
 <select name="class">
+
 <option>1st</option>
 <option>2nd</option>
 <option>3rd</option>
@@ -21,13 +28,16 @@ Class<br>
 <option>10th</option>
 <option>11th</option>
 <option>12th</option>
+
 </select><br><br>
 
 Subject<br>
 <select name="subject">
+
 <option>All Subjects</option>
 <option>Phonics</option>
 <option>Abacus</option>
+
 </select><br><br>
 
 Phone<br>
@@ -40,11 +50,13 @@ Monthly Fee<br>
 
 </form>
 
-<hr>
+</div>
+
+<div class="card">
 
 <h3>Student List</h3>
 
-<table border="1" cellpadding="10">
+<table>
 
 <tr>
 <th>Name</th>
@@ -67,3 +79,7 @@ Monthly Fee<br>
 {% endfor %}
 
 </table>
+
+</div>
+
+{% endblock %}
