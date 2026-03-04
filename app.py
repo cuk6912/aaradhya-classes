@@ -75,3 +75,22 @@ def add_student():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
+@app.route("/teachers")
+def teachers():
+    return render_template("teachers.html")
+
+@app.route("/batches")
+def batches():
+    return render_template("batches.html")
+
+@app.route("/attendance")
+def attendance():
+    return render_template("attendance.html")
+
+@app.route("/fees")
+def fees():
+    return render_template("fees.html")
+
+@app.route("/reports")
+def reports():
+    return render_template("reports.html")
