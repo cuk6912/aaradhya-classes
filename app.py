@@ -4,6 +4,7 @@ import os
 
 app = Flask(__name__)
 
+# DATABASE CONFIGURATION FOR RAILWAY
 database_url = os.getenv("DATABASE_URL")
 
 if database_url and database_url.startswith("postgres://"):
@@ -14,10 +15,12 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db.init_app(app)
 
+# Create tables
 with app.app_context():
     db.create_all()
 
 
+# DASHBOARD
 @app.route("/")
 def dashboard():
 
@@ -39,6 +42,7 @@ def dashboard():
     )
 
 
+# STUDENTS PAGE
 @app.route("/students")
 def students():
 
@@ -47,6 +51,7 @@ def students():
     return render_template("students.html", students=students)
 
 
+# ADD STUDENT
 @app.route("/add_student", methods=["POST"])
 def add_student():
 
