@@ -110,7 +110,16 @@ def fees():
 @app.route("/reports")
 def reports():
     return render_template("reports.html")
+@app.route("/edit_student/<int:id>")
+def edit_student(id):
 
+    student = Student.query.get(id)
+
+    return f"""
+    <h2>Edit Student</h2>
+    <p>Editing: {student.name}</p>
+    <a href='/students'>Back</a>
+    """
 
 if __name__ == "__main__":
     app.run()
