@@ -1,23 +1,42 @@
 <h2>Student Management</h2>
 
+<h3>Add Student</h3>
+
 <form method="POST" action="/add_student">
 
-Name
-<input name="name"><br><br>
+Name<br>
+<input name="name" required><br><br>
 
-Class
-<input name="class"><br><br>
+Class<br>
+<select name="class">
+<option>1st</option>
+<option>2nd</option>
+<option>3rd</option>
+<option>4th</option>
+<option>5th</option>
+<option>6th</option>
+<option>7th</option>
+<option>8th</option>
+<option>9th</option>
+<option>10th</option>
+<option>11th</option>
+<option>12th</option>
+</select><br><br>
 
-Subject
-<input name="subject"><br><br>
+Subject<br>
+<select name="subject">
+<option>All Subjects</option>
+<option>Phonics</option>
+<option>Abacus</option>
+</select><br><br>
 
-Phone
+Phone<br>
 <input name="phone"><br><br>
 
-Monthly Fee
+Monthly Fee<br>
 <input name="fee"><br><br>
 
-<button>Add Student</button>
+<button type="submit">Add Student</button>
 
 </form>
 
@@ -25,14 +44,26 @@ Monthly Fee
 
 <h3>Student List</h3>
 
+<table border="1" cellpadding="10">
+
+<tr>
+<th>Name</th>
+<th>Class</th>
+<th>Subject</th>
+<th>Phone</th>
+<th>Fee</th>
+</tr>
+
 {% for s in students %}
 
-{{s.name}} |
-{{s.student_class}} |
-{{s.subject}} |
-{{s.phone}} |
-₹{{s.monthly_fee}}
-
-<br>
+<tr>
+<td>{{s.name}}</td>
+<td>{{s.student_class}}</td>
+<td>{{s.subject}}</td>
+<td>{{s.phone}}</td>
+<td>{{s.monthly_fee}}</td>
+</tr>
 
 {% endfor %}
+
+</table>
