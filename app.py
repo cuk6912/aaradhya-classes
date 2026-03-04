@@ -4,30 +4,32 @@ import os
 
 app = Flask(__name__)
 
-# DATABASE CONFIGURATION FOR RAILWAY
+# Get DATABASE_URL from Railway
 database_url = os.getenv("DATABASE_URL")
 
+# Railway sometimes gives postgres:// which SQLAlchemy does not accept
 if database_url and database_url.startswith("postgres://"):
     database_url = database_url.replace("postgres://", "postgresql://", 1)
+
+# Fallback for local run if DATABASE_URL not present
+if not database_url:
+    database_url = "sqlite:///local.db"
 
 app.config["SQLALCHEMY_DATABASE_URI"] = database_url
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db.init_app(app)
 
-# Create tables
 with app.app_context():
     db.create_all()
 
 
-# DASHBOARD
 @app.route("/")
 def dashboard():
 
     students = Student.query.all()
 
     total_students = len(students)
-
     total_revenue = sum([s.monthly_fee for s in students]) if students else 0
 
     classes = set([s.student_class for s in students])
@@ -42,16 +44,12 @@ def dashboard():
     )
 
 
-# STUDENTS PAGE
 @app.route("/students")
 def students():
-
     students = Student.query.all()
-
     return render_template("students.html", students=students)
 
 
-# ADD STUDENT
 @app.route("/add_student", methods=["POST"])
 def add_student():
 
@@ -59,7 +57,7 @@ def add_student():
     student_class = request.form["class"]
     subject = request.form["subject"]
     phone = request.form["phone"]
-    monthly_fee = request.form["fee"]
+    monthly_fee = int(request.form["fee"])
 
     new_student = Student(
         name=name,
@@ -76,4 +74,4 @@ def add_student():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5000)
