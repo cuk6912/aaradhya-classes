@@ -1,0 +1,19 @@
+<h2>Students</h2>
+
+<form method="POST" action="/add_student">
+
+Name <input name="name"><br>
+Class <input name="class"><br>
+Phone <input name="phone"><br>
+
+<button>Add Student</button>
+
+</form>
+
+<hr>
+
+{% for s in students %}
+
+{{s.name}} | {{s.student_class}} | {{s.phone}} <br>
+
+{% endfor %}
