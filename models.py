@@ -2,6 +2,18 @@ from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
+
+class User(db.Model):
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    username = db.Column(db.String(50), unique=True)
+
+    password = db.Column(db.String(100))
+
+    role = db.Column(db.String(20))
+
+
 class Student(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
@@ -19,3 +31,5 @@ class Student(db.Model):
     join_date = db.Column(db.String(20))
 
     leave_date = db.Column(db.String(20))
+
+    parent_username = db.Column(db.String(50))
