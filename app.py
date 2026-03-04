@@ -1,54 +1,44 @@
-import os
 from flask import Flask, render_template, request, redirect
-from flask_sqlalchemy import SQLAlchemy
+from models import db, Student
+import os
 
 app = Flask(__name__)
 
-# Get Railway database URL
-DATABASE_URL = os.environ.get("DATABASE_URL")
-
-# If Railway gives postgres:// fix it
-if DATABASE_URL and DATABASE_URL.startswith("postgres://"):
-    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql+psycopg2://", 1)
-
-# If database not available use SQLite fallback
-if not DATABASE_URL:
-    DATABASE_URL = "sqlite:///local.db"
-
-app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL
+# Railway PostgreSQL connection
+app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
-db = SQLAlchemy(app)
+db.init_app(app)
 
 
-# -------------------------
-# Database Model
-# -------------------------
-
-class Student(db.Model):
-
-    id = db.Column(db.Integer, primary_key=True)
-
-    name = db.Column(db.String(100))
-
-    student_class = db.Column(db.String(20))
-
-    subject = db.Column(db.String(50))
-
-    phone = db.Column(db.String(20))
-
-    monthly_fee = db.Column(db.Integer)
+# Create tables automatically
+with app.app_context():
+    db.create_all()
 
 
-# -------------------------
-# Routes
-# -------------------------
-
+# Dashboard
 @app.route("/")
 def dashboard():
-    return render_template("dashboard.html")
+
+    students = Student.query.all()
+
+    total_students = len(students)
+
+    total_revenue = sum([s.monthly_fee for s in students]) if students else 0
+
+    classes = set([s.student_class for s in students])
+    subjects = set([s.subject for s in students])
+
+    return render_template(
+        "dashboard.html",
+        total_students=total_students,
+        total_revenue=total_revenue,
+        total_classes=len(classes),
+        total_subjects=len(subjects)
+    )
 
 
+# Student Page
 @app.route("/students")
 def students():
 
@@ -57,25 +47,22 @@ def students():
     return render_template("students.html", students=students)
 
 
+# Add Student
 @app.route("/add_student", methods=["POST"])
 def add_student():
 
     name = request.form["name"]
-
     student_class = request.form["class"]
-
     subject = request.form["subject"]
-
     phone = request.form["phone"]
-
-    fee = request.form["fee"]
+    monthly_fee = request.form["fee"]
 
     new_student = Student(
         name=name,
         student_class=student_class,
         subject=subject,
         phone=phone,
-        monthly_fee=fee
+        monthly_fee=monthly_fee
     )
 
     db.session.add(new_student)
@@ -84,18 +71,6 @@ def add_student():
     return redirect("/students")
 
 
-# -------------------------
-# Create tables
-# -------------------------
-
-with app.app_context():
-    db.create_all()
-
-
-# -------------------------
-# Run server
-# -------------------------
-
+# Run locally
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 8080))
-    app.run(host="0.0.0.0", port=port)
+    app.run(debug=True)
