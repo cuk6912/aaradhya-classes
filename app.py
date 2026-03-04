@@ -14,22 +14,41 @@ def dashboard():
 
 @app.route("/students")
 def students():
+
     students = Student.query.all()
+
     return render_template("students.html", students=students)
+
 
 @app.route("/add_student", methods=["POST"])
 def add_student():
+
     name = request.form["name"]
+
     student_class = request.form["class"]
+
+    subject = request.form["subject"]
+
     phone = request.form["phone"]
 
+    fee = request.form["fee"]
+
     student = Student(
+
         name=name,
+
         student_class=student_class,
-        phone=phone
+
+        subject=subject,
+
+        phone=phone,
+
+        monthly_fee=fee
+
     )
 
     db.session.add(student)
+
     db.session.commit()
 
     return redirect("/students")
