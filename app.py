@@ -4,12 +4,9 @@ import os
 from datetime import date
 
 app = Flask(__name__)
-
 app.secret_key = "aaradhya_secret_key"
 
-
-# ---------------- DATABASE CONFIG ---------------- #
-
+# DATABASE CONFIG
 DATABASE_URL = os.getenv("DATABASE_URL")
 
 if not DATABASE_URL:
@@ -21,32 +18,21 @@ if DATABASE_URL.startswith("postgres://"):
 app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
-
 db.init_app(app)
 
-
 with app.app_context():
-
     db.create_all()
 
-    # Create default admin
+    # create default admin
     if not User.query.filter_by(username="admin").first():
-
-        admin = User(
-            username="admin",
-            password="admin123",
-            role="admin"
-        )
-
+        admin = User(username="admin", password="admin123", role="admin")
         db.session.add(admin)
         db.session.commit()
 
 
-# ---------------- LOGIN ---------------- #
-
+# LOGIN
 @app.route("/login", methods=["GET","POST"])
 def login():
-
     if request.method == "POST":
 
         username = request.form["username"]
@@ -58,10 +44,8 @@ def login():
         ).first()
 
         if user:
-
             session["user"] = user.username
             session["role"] = user.role
-
             return redirect("/")
 
     return render_template("login.html")
@@ -69,14 +53,11 @@ def login():
 
 @app.route("/logout")
 def logout():
-
     session.clear()
-
     return redirect("/login")
 
 
-# ---------------- DASHBOARD ---------------- #
-
+# DASHBOARD
 @app.route("/")
 def dashboard():
 
@@ -86,7 +67,6 @@ def dashboard():
     students = Student.query.filter_by(leave_date=None).all()
 
     total_students = len(students)
-
     total_revenue = sum([s.monthly_fee for s in students]) if students else 0
 
     classes = set([s.student_class for s in students])
@@ -101,8 +81,7 @@ def dashboard():
     )
 
 
-# ---------------- STUDENTS ---------------- #
-
+# STUDENTS
 @app.route("/students")
 def students():
 
@@ -110,7 +89,6 @@ def students():
         return redirect("/login")
 
     active_students = Student.query.filter_by(leave_date=None).all()
-
     history_students = Student.query.filter(Student.leave_date != None).all()
 
     return render_template(
@@ -124,14 +102,12 @@ def students():
 def add_student():
 
     new_student = Student(
-
         name=request.form["name"],
         student_class=request.form["class"],
         subject=request.form["subject"],
         phone=request.form["phone"],
         monthly_fee=request.form["fee"],
         join_date=request.form["join_date"]
-
     )
 
     db.session.add(new_student)
@@ -144,7 +120,6 @@ def add_student():
 def leave_student(id):
 
     student = Student.query.get(id)
-
     student.leave_date = date.today()
 
     db.session.commit()
@@ -152,63 +127,23 @@ def leave_student(id):
     return redirect("/students")
 
 
-# ---------------- TEACHERS ---------------- #
-
+# OTHER MODULES
 @app.route("/teachers")
 def teachers():
-
-    if "user" not in session:
-        return redirect("/login")
-
     return render_template("teachers.html")
-
-
-# ---------------- BATCHES ---------------- #
 
 @app.route("/batches")
 def batches():
-
-    if "user" not in session:
-        return redirect("/login")
-
     return render_template("batches.html")
-
-
-# ---------------- ATTENDANCE ---------------- #
 
 @app.route("/attendance")
 def attendance():
-
-    if "user" not in session:
-        return redirect("/login")
-
     return render_template("attendance.html")
-
-
-# ---------------- FEES ---------------- #
 
 @app.route("/fees")
 def fees():
-
-    if "user" not in session:
-        return redirect("/login")
-
     return render_template("fees.html")
-
-
-# ---------------- REPORTS ---------------- #
 
 @app.route("/reports")
 def reports():
-
-    if "user" not in session:
-        return redirect("/login")
-
     return render_template("reports.html")
-
-
-# ---------------- START SERVER ---------------- #
-
-if __name__ == "__main__":
-
-    app.run(host="0.0.0.0", port=5000)
