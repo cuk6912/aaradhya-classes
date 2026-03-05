@@ -2,7 +2,68 @@
 
 {% block content %}
 
-<h2>Fees</h2>
-<p>Fee management module coming soon.</p>
+<h2>Fee Management</h2>
+
+<h3>Record Payment</h3>
+
+<form method="POST" action="/pay_fee">
+
+Student<br>
+
+<select name="student_id">
+
+{% for s in students %}
+
+<option value="{{s.id}}">
+{{s.name}}
+</option>
+
+{% endfor %}
+
+</select>
+
+<br><br>
+
+Amount<br>
+<input name="amount">
+
+<br><br>
+
+Month<br>
+<input name="month">
+
+<br><br>
+
+<button>Save Payment</button>
+
+</form>
+
+<hr>
+
+<h3>Payment History</h3>
+
+<table border="1" cellpadding="10">
+
+<tr>
+<th>Student</th>
+<th>Amount</th>
+<th>Month</th>
+<th>Date</th>
+</tr>
+
+{% for f in fees %}
+
+<tr>
+
+<td>{{f.student_id}}</td>
+<td>{{f.amount}}</td>
+<td>{{f.month}}</td>
+<td>{{f.payment_date}}</td>
+
+</tr>
+
+{% endfor %}
+
+</table>
 
 {% endblock %}
