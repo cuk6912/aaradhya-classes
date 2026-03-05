@@ -12,12 +12,12 @@
 
 <div class="row">
 
-<div class="col-md-3">
+<div class="col-md-2">
 <label>Name</label>
 <input class="form-control" name="name" required>
 </div>
 
-<div class="col-md-2">
+<div class="col-md-1">
 <label>Class</label>
 <select class="form-control" name="class">
 <option>1st</option>
@@ -52,9 +52,19 @@
 <input class="form-control" name="phone">
 </div>
 
-<div class="col-md-2">
-<label>Monthly Fee</label>
+<div class="col-md-1">
+<label>Fee</label>
 <input class="form-control" name="monthly_fee">
+</div>
+
+<div class="col-md-2">
+<label>Date of Joining</label>
+<input type="date" class="form-control" name="join_date">
+</div>
+
+<div class="col-md-2">
+<label>Date of Leaving</label>
+<input type="date" class="form-control" name="leave_date">
 </div>
 
 <div class="col-md-1">
@@ -68,9 +78,11 @@
 
 </div>
 
-<div class="card p-3">
+<!-- ACTIVE STUDENTS -->
 
-<h4>Student List</h4>
+<div class="card p-3 mb-4">
+
+<h4>Active Students</h4>
 
 <table class="table table-striped">
 
@@ -80,6 +92,7 @@
 <th>Subject</th>
 <th>Phone</th>
 <th>Fee</th>
+<th>Join Date</th>
 </tr>
 
 {% for s in students %}
@@ -91,6 +104,43 @@
 <td>{{s.subject}}</td>
 <td>{{s.phone}}</td>
 <td>{{s.monthly_fee}}</td>
+<td>{{s.join_date}}</td>
+
+</tr>
+
+{% endfor %}
+
+</table>
+
+</div>
+
+<!-- STUDENT HISTORY -->
+
+<div class="card p-3">
+
+<h4>Student History</h4>
+
+<table class="table table-bordered">
+
+<tr>
+<th>Name</th>
+<th>Class</th>
+<th>Subject</th>
+<th>Phone</th>
+<th>Join Date</th>
+<th>Leave Date</th>
+</tr>
+
+{% for s in history %}
+
+<tr>
+
+<td>{{s.name}}</td>
+<td>{{s.student_class}}</td>
+<td>{{s.subject}}</td>
+<td>{{s.phone}}</td>
+<td>{{s.join_date}}</td>
+<td>{{s.leave_date}}</td>
 
 </tr>
 
