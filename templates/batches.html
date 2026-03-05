@@ -2,17 +2,23 @@
 
 {% block content %}
 
-<h2>Batch Management</h2>
+<h2 class="mb-4">Batch Management</h2>
 
-<h3>Create Batch</h3>
+<div class="card p-4 mb-4">
+
+<h5>Create Batch</h5>
 
 <form method="POST" action="/add_batch">
 
-Batch Name<br>
-<input name="batch_name" required><br><br>
+<div class="row">
 
-Class<br>
-<select name="class_name">
+<div class="col-md-3">
+<input class="form-control" name="batch_name" placeholder="Batch Name">
+</div>
+
+<div class="col-md-2">
+
+<select class="form-control" name="class_name">
 
 <option>1st</option>
 <option>2nd</option>
@@ -27,10 +33,13 @@ Class<br>
 <option>11th</option>
 <option>12th</option>
 
-</select><br><br>
+</select>
 
-Subject<br>
-<select name="subject">
+</div>
+
+<div class="col-md-2">
+
+<select class="form-control" name="subject">
 
 <option>All Subjects</option>
 <option>Maths</option>
@@ -39,29 +48,45 @@ Subject<br>
 <option>Phonics</option>
 <option>Abacus</option>
 
-</select><br><br>
+</select>
 
-Teacher<br>
-<select name="teacher_id">
+</div>
+
+<div class="col-md-2">
+
+<select class="form-control" name="teacher_id">
 
 {% for t in teachers %}
-<option value="{{t.id}}">{{t.name}}</option>
+
+<option value="{{t.id}}">
+{{t.name}}
+</option>
+
 {% endfor %}
 
-</select><br><br>
+</select>
 
-Time<br>
-<input name="time" placeholder="5 PM"><br><br>
+</div>
 
-<button>Create Batch</button>
+<div class="col-md-2">
+
+<input class="form-control" name="time" placeholder="5 PM">
+
+</div>
+
+</div>
+
+<button class="btn btn-success mt-3">Create Batch</button>
 
 </form>
 
-<hr>
+</div>
 
-<h3>Batch List</h3>
+<div class="card p-4">
 
-<table border="1" cellpadding="10">
+<h5>Batch List</h5>
+
+<table class="table">
 
 <tr>
 <th>Batch</th>
@@ -86,5 +111,7 @@ Time<br>
 {% endfor %}
 
 </table>
+
+</div>
 
 {% endblock %}
