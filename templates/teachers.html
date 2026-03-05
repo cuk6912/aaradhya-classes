@@ -2,30 +2,41 @@
 
 {% block content %}
 
-<h2>Teacher Management</h2>
+<h2 class="mb-4">Teacher Management</h2>
 
-<h3>Add Teacher</h3>
+<div class="card p-4 mb-4">
+
+<h5>Add Teacher</h5>
 
 <form method="POST" action="/add_teacher">
 
-Name<br>
-<input name="name"><br><br>
+<div class="row">
 
-Subject<br>
-<input name="subject"><br><br>
+<div class="col-md-4">
+<input class="form-control" name="name" placeholder="Teacher Name">
+</div>
 
-Phone<br>
-<input name="phone"><br><br>
+<div class="col-md-4">
+<input class="form-control" name="subject" placeholder="Subject">
+</div>
 
-<button>Add Teacher</button>
+<div class="col-md-4">
+<input class="form-control" name="phone" placeholder="Phone">
+</div>
+
+</div>
+
+<button class="btn btn-primary mt-3">Add Teacher</button>
 
 </form>
 
-<hr>
+</div>
 
-<h3>Teacher List</h3>
+<div class="card p-4">
 
-<table border="1" cellpadding="10">
+<h5>Teacher List</h5>
+
+<table class="table">
 
 <tr>
 <th>Name</th>
@@ -36,13 +47,17 @@ Phone<br>
 {% for t in teachers %}
 
 <tr>
+
 <td>{{t.name}}</td>
 <td>{{t.subject}}</td>
 <td>{{t.phone}}</td>
+
 </tr>
 
 {% endfor %}
 
 </table>
+
+</div>
 
 {% endblock %}
