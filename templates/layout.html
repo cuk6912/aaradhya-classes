@@ -13,7 +13,11 @@
 
 body{
 background:#f4f6f9;
+margin:0;
+font-family:Arial;
 }
+
+/* SIDEBAR */
 
 .sidebar{
 height:100vh;
@@ -23,13 +27,15 @@ background:#2c3e50;
 color:white;
 padding:20px;
 transition:0.3s;
+z-index:9999;
+overflow-y:auto;
 }
 
 .sidebar a{
 display:block;
 color:white;
 text-decoration:none;
-margin:10px 0;
+margin:8px 0;
 padding:8px;
 border-radius:4px;
 }
@@ -38,14 +44,31 @@ border-radius:4px;
 background:#34495e;
 }
 
+.sidebar h6{
+color:#bbb;
+margin-top:20px;
+}
+
+/* MAIN CONTENT */
+
 .main{
 margin-left:250px;
 padding:20px;
 }
 
+/* MOBILE MENU BUTTON */
+
 .menu-btn{
 display:none;
 }
+
+/* FIX CHARTS LAYER */
+
+canvas{
+z-index:1 !important;
+}
+
+/* MOBILE RESPONSIVE */
 
 @media (max-width:768px){
 
@@ -80,22 +103,22 @@ margin-bottom:15px;
 
 <a href="/">Dashboard</a>
 
-<h6 style="color:#bbb;margin-top:20px">Management</h6>
+<h6>Management</h6>
 
 <a href="/students">Students</a>
 <a href="/teachers">Teachers</a>
 <a href="/batches">Batches</a>
 
-<h6 style="color:#bbb;margin-top:20px">Academics</h6>
+<h6>Academics</h6>
 
 <a href="/attendance">Attendance</a>
 <a href="/fees">Fees</a>
 
-<h6 style="color:#bbb;margin-top:20px">Analytics</h6>
+<h6>Analytics</h6>
 
 <a href="/reports">Reports</a>
 
-<a href="/logout" style="margin-top:30px;color:#ffb3b3">Logout</a>
+<a href="/logout" style="margin-top:25px;color:#ffb3b3">Logout</a>
 
 </div>
 
