@@ -1,31 +1,118 @@
-<div class="row">
+{% extends "layout.html" %}
+
+{% block content %}
+
+<h2 class="mb-4">Dashboard</h2>
+
+<div class="row g-4">
 
 <div class="col-md-3">
+
 <div class="card p-3">
+
 <h6>Total Students</h6>
-<h3>{{total_students}}</h3>
+
+<h2>{{total_students}}</h2>
+
 </div>
+
 </div>
 
 <div class="col-md-3">
+
 <div class="card p-3">
+
 <h6>Total Revenue</h6>
-<h3>₹ {{total_revenue}}</h3>
+
+<h2>₹ {{total_revenue}}</h2>
+
 </div>
+
 </div>
 
 <div class="col-md-3">
+
 <div class="card p-3">
+
 <h6>Pending Fees</h6>
-<h3 style="color:red">₹ {{pending_fees}}</h3>
+
+<h2 style="color:red">₹ {{pending_fees}}</h2>
+
 </div>
+
 </div>
 
 <div class="col-md-3">
+
 <div class="card p-3">
+
 <h6>Overdue Students</h6>
-<h3 style="color:red">{{overdue_students}}</h3>
-</div>
+
+<h2 style="color:red">{{overdue_students}}</h2>
+
 </div>
 
 </div>
+
+</div>
+
+<div class="row mt-5">
+
+<div class="col-md-6">
+
+<div class="card p-4">
+
+<h5>Student Growth</h5>
+
+<canvas id="studentsChart"></canvas>
+
+</div>
+
+</div>
+
+<div class="col-md-6">
+
+<div class="card p-4">
+
+<h5>Monthly Revenue</h5>
+
+<canvas id="revenueChart"></canvas>
+
+</div>
+
+</div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+
+new Chart(document.getElementById("studentsChart"),{
+type:'line',
+data:{
+labels:["Jan","Feb","Mar","Apr","May","Jun"],
+datasets:[{
+label:"Students",
+data:[5,10,15,20,25,30],
+borderColor:"blue",
+fill:false
+}]
+}
+})
+
+new Chart(document.getElementById("revenueChart"),{
+type:'bar',
+data:{
+labels:["Jan","Feb","Mar","Apr","May","Jun"],
+datasets:[{
+label:"Revenue",
+data:[10000,15000,20000,25000,30000,35000],
+backgroundColor:"green"
+}]
+}
+})
+
+</script>
+
+{% endblock %}
