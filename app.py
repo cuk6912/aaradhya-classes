@@ -85,15 +85,10 @@ def dashboard():
 
     revenue = db.session.query(db.func.sum(Fee.amount)).scalar() or 0
 
-    pending = db.session.query(
-        db.func.sum(Student.monthly_fee)
-    ).scalar() or 0
-
     return render_template(
         "dashboard.html",
         total_students=total_students,
-        revenue=revenue,
-        pending=pending
+        revenue=revenue
     )
 
 # =====================
@@ -192,40 +187,6 @@ def attendance():
     return render_template("attendance.html", batches=batches)
 
 
-@app.route("/mark_attendance/<batch_id>")
-def mark_attendance(batch_id):
-
-    students = Student.query.filter_by(batch_id=batch_id).all()
-
-    return render_template(
-        "mark_attendance.html",
-        students=students,
-        batch_id=batch_id
-    )
-
-
-@app.route("/save_attendance/<batch_id>", methods=["POST"])
-def save_attendance(batch_id):
-
-    students = Student.query.filter_by(batch_id=batch_id).all()
-
-    for student in students:
-
-        status = request.form.get(str(student.id))
-
-        record = Attendance(
-            student_id=student.id,
-            batch_id=batch_id,
-            date=date.today(),
-            status=status
-        )
-
-        db.session.add(record)
-
-    db.session.commit()
-
-    return redirect("/attendance")
-
 # =====================
 # FEES
 # =====================
@@ -234,14 +195,9 @@ def save_attendance(batch_id):
 def fees():
 
     students = Student.query.filter_by(leave_date=None).all()
-
     fees = Fee.query.all()
 
-    return render_template(
-        "fees.html",
-        students=students,
-        fees=fees
-    )
+    return render_template("fees.html", students=students, fees=fees)
 
 
 @app.route("/pay_fee", methods=["POST"])
@@ -258,6 +214,27 @@ def pay_fee():
     db.session.commit()
 
     return redirect("/fees")
+
+# =====================
+# REPORTS
+# =====================
+
+@app.route("/reports")
+def reports():
+
+    total_students = Student.query.count()
+    total_teachers = Teacher.query.count()
+    total_batches = Batch.query.count()
+
+    revenue = db.session.query(db.func.sum(Fee.amount)).scalar() or 0
+
+    return render_template(
+        "reports.html",
+        total_students=total_students,
+        total_teachers=total_teachers,
+        total_batches=total_batches,
+        revenue=revenue
+    )
 
 
 if __name__ == "__main__":
