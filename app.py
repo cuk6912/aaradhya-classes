@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, session
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func
-from datetime import date
+from datetime import datetime, date
 import os
 
 app = Flask(__name__)
@@ -51,7 +51,6 @@ class Student(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
     name = db.Column(db.String(100))
-
     student_class = db.Column(db.String(20))
     subject = db.Column(db.String(100))
 
@@ -137,6 +136,15 @@ def add_student():
     join_date = request.form.get("join_date")
     leave_date = request.form.get("leave_date")
 
+    join_date_obj = None
+    leave_date_obj = None
+
+    if join_date:
+        join_date_obj = datetime.strptime(join_date, "%Y-%m-%d").date()
+
+    if leave_date:
+        leave_date_obj = datetime.strptime(leave_date, "%Y-%m-%d").date()
+
     student = Student(
 
         name=request.form["name"],
@@ -149,9 +157,9 @@ def add_student():
 
         monthly_fee=request.form["monthly_fee"],
 
-        join_date=join_date if join_date else None,
+        join_date=join_date_obj,
 
-        leave_date=leave_date if leave_date else None
+        leave_date=leave_date_obj
 
     )
 
@@ -251,21 +259,15 @@ def attendance():
 @app.route("/mark_attendance", methods=["POST"])
 def mark_attendance():
 
-    student_id = request.form["student_id"]
-
-    batch_id = request.form["batch_id"]
-
-    status = request.form["status"]
-
     record = Attendance(
 
-        student_id=student_id,
+        student_id=request.form["student_id"],
 
-        batch_id=batch_id,
+        batch_id=request.form["batch_id"],
 
         date=date.today(),
 
-        status=status
+        status=request.form["status"]
 
     )
 
@@ -356,9 +358,6 @@ def parent_login():
 
     return render_template("parent_login.html")
 
-# ===============================
-# PARENT DASHBOARD
-# ===============================
 
 @app.route("/parent-dashboard")
 def parent_dashboard():
