@@ -2,15 +2,19 @@
 
 {% block content %}
 
-<h2>Fee Management</h2>
+<h2 class="mb-4">Fee Management</h2>
 
-<h3>Record Payment</h3>
+<div class="card p-4 mb-4">
+
+<h5>Record Payment</h5>
 
 <form method="POST" action="/pay_fee">
 
-Student<br>
+<div class="row">
 
-<select name="student_id">
+<div class="col-md-4">
+
+<select class="form-control" name="student_id">
 
 {% for s in students %}
 
@@ -22,27 +26,29 @@ Student<br>
 
 </select>
 
-<br><br>
+</div>
 
-Amount<br>
-<input name="amount">
+<div class="col-md-3">
+<input class="form-control" name="amount" placeholder="Amount">
+</div>
 
-<br><br>
+<div class="col-md-3">
+<input class="form-control" name="month" placeholder="Month">
+</div>
 
-Month<br>
-<input name="month">
+</div>
 
-<br><br>
-
-<button>Save Payment</button>
+<button class="btn btn-success mt-3">Save Payment</button>
 
 </form>
 
-<hr>
+</div>
 
-<h3>Payment History</h3>
+<div class="card p-4">
 
-<table border="1" cellpadding="10">
+<h5>Payment History</h5>
+
+<table class="table">
 
 <tr>
 <th>Student</th>
@@ -65,5 +71,7 @@ Month<br>
 {% endfor %}
 
 </table>
+
+</div>
 
 {% endblock %}
