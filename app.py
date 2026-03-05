@@ -15,10 +15,9 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
 
-
-# =========================
+# =====================
 # MODELS
-# =========================
+# =====================
 
 class Teacher(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -32,7 +31,7 @@ class Batch(db.Model):
     batch_name = db.Column(db.String(100))
     class_name = db.Column(db.String(20))
     subject = db.Column(db.String(100))
-    teacher_id = db.Column(db.Integer, db.ForeignKey('teacher.id'))
+    teacher_id = db.Column(db.Integer)
     time = db.Column(db.String(50))
 
 
@@ -43,9 +42,10 @@ class Student(db.Model):
     student_class = db.Column(db.String(20))
     subject = db.Column(db.String(100))
     phone = db.Column(db.String(20))
+
     monthly_fee = db.Column(db.Integer)
 
-    batch_id = db.Column(db.Integer, db.ForeignKey('batch.id'))
+    batch_id = db.Column(db.Integer)
 
     join_date = db.Column(db.Date)
     leave_date = db.Column(db.Date)
@@ -54,40 +54,51 @@ class Student(db.Model):
 class Attendance(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
-    student_id = db.Column(db.Integer, db.ForeignKey('student.id'))
-    batch_id = db.Column(db.Integer, db.ForeignKey('batch.id'))
+    student_id = db.Column(db.Integer)
+    batch_id = db.Column(db.Integer)
 
     date = db.Column(db.Date)
-
     status = db.Column(db.String(10))
+
+
+class Fee(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+
+    student_id = db.Column(db.Integer)
+    amount = db.Column(db.Integer)
+
+    month = db.Column(db.String(20))
+    payment_date = db.Column(db.Date)
 
 
 with app.app_context():
     db.create_all()
 
-
-# =========================
+# =====================
 # DASHBOARD
-# =========================
+# =====================
 
 @app.route("/")
 def dashboard():
 
     total_students = Student.query.filter_by(leave_date=None).count()
-    total_batches = Batch.query.count()
-    total_teachers = Teacher.query.count()
+
+    revenue = db.session.query(db.func.sum(Fee.amount)).scalar() or 0
+
+    pending = db.session.query(
+        db.func.sum(Student.monthly_fee)
+    ).scalar() or 0
 
     return render_template(
         "dashboard.html",
         total_students=total_students,
-        total_batches=total_batches,
-        total_teachers=total_teachers
+        revenue=revenue,
+        pending=pending
     )
 
-
-# =========================
+# =====================
 # STUDENTS
-# =========================
+# =====================
 
 @app.route("/students")
 def students():
@@ -114,10 +125,9 @@ def add_student():
 
     return redirect("/students")
 
-
-# =========================
+# =====================
 # TEACHERS
-# =========================
+# =====================
 
 @app.route("/teachers")
 def teachers():
@@ -141,10 +151,9 @@ def add_teacher():
 
     return redirect("/teachers")
 
-
-# =========================
+# =====================
 # BATCHES
-# =========================
+# =====================
 
 @app.route("/batches")
 def batches():
@@ -171,10 +180,9 @@ def add_batch():
 
     return redirect("/batches")
 
-
-# =========================
+# =====================
 # ATTENDANCE
-# =========================
+# =====================
 
 @app.route("/attendance")
 def attendance():
@@ -217,6 +225,39 @@ def save_attendance(batch_id):
     db.session.commit()
 
     return redirect("/attendance")
+
+# =====================
+# FEES
+# =====================
+
+@app.route("/fees")
+def fees():
+
+    students = Student.query.filter_by(leave_date=None).all()
+
+    fees = Fee.query.all()
+
+    return render_template(
+        "fees.html",
+        students=students,
+        fees=fees
+    )
+
+
+@app.route("/pay_fee", methods=["POST"])
+def pay_fee():
+
+    fee = Fee(
+        student_id=request.form["student_id"],
+        amount=request.form["amount"],
+        month=request.form["month"],
+        payment_date=date.today()
+    )
+
+    db.session.add(fee)
+    db.session.commit()
+
+    return redirect("/fees")
 
 
 if __name__ == "__main__":
