@@ -3,6 +3,27 @@
 {% block content %}
 
 <h2>Attendance</h2>
-<p>Attendance system coming soon.</p>
+
+<table border="1" cellpadding="10">
+
+<tr>
+<th>Batch</th>
+<th>Action</th>
+</tr>
+
+{% for b in batches %}
+
+<tr>
+<td>{{b.batch_name}}</td>
+<td>
+<a href="/mark_attendance/{{b.id}}">
+Mark Attendance
+</a>
+</td>
+</tr>
+
+{% endfor %}
+
+</table>
 
 {% endblock %}
