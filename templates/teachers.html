@@ -2,7 +2,47 @@
 
 {% block content %}
 
-<h2>Teachers</h2>
-<p>Teacher management module coming soon.</p>
+<h2>Teacher Management</h2>
+
+<h3>Add Teacher</h3>
+
+<form method="POST" action="/add_teacher">
+
+Name<br>
+<input name="name"><br><br>
+
+Subject<br>
+<input name="subject"><br><br>
+
+Phone<br>
+<input name="phone"><br><br>
+
+<button>Add Teacher</button>
+
+</form>
+
+<hr>
+
+<h3>Teacher List</h3>
+
+<table border="1" cellpadding="10">
+
+<tr>
+<th>Name</th>
+<th>Subject</th>
+<th>Phone</th>
+</tr>
+
+{% for t in teachers %}
+
+<tr>
+<td>{{t.name}}</td>
+<td>{{t.subject}}</td>
+<td>{{t.phone}}</td>
+</tr>
+
+{% endfor %}
+
+</table>
 
 {% endblock %}
