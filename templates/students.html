@@ -1,25 +1,30 @@
 {% extends "layout.html" %}
+
 {% block content %}
 
 <h2 class="mb-4">Student Management</h2>
 
+
+<!-- ADD STUDENT CARD -->
+
 <div class="card shadow-sm mb-4">
 <div class="card-body">
 
-<h5>Add Student</h5>
+<h5 class="mb-3">Add Student</h5>
 
 <form method="POST" action="/add_student">
 
 <div class="row g-3">
 
 <div class="col-md-3">
-<label>Name</label>
+<label class="form-label">Name</label>
 <input name="name" class="form-control" required>
 </div>
 
 <div class="col-md-2">
-<label>Class</label>
+<label class="form-label">Class</label>
 <select name="class" class="form-control">
+
 <option>1st</option>
 <option>2nd</option>
 <option>3rd</option>
@@ -32,30 +37,33 @@
 <option>10th</option>
 <option>11th</option>
 <option>12th</option>
+
 </select>
 </div>
 
 <div class="col-md-2">
-<label>Subject</label>
+<label class="form-label">Subject</label>
 <select name="subject" class="form-control">
+
 <option>All Subjects</option>
 <option>Phonics</option>
 <option>Abacus</option>
+
 </select>
 </div>
 
 <div class="col-md-2">
-<label>Phone</label>
+<label class="form-label">Phone</label>
 <input name="phone" class="form-control">
 </div>
 
 <div class="col-md-1">
-<label>Fee</label>
+<label class="form-label">Fee</label>
 <input name="fee" type="number" class="form-control">
 </div>
 
 <div class="col-md-2">
-<label>Joining Date</label>
+<label class="form-label">Joining Date</label>
 <input name="join_date" type="date" class="form-control">
 </div>
 
@@ -71,27 +79,36 @@
 </div>
 
 
+
+<!-- ACTIVE STUDENTS -->
+
 <div class="card shadow-sm">
 <div class="card-body">
 
 <div class="d-flex justify-content-between mb-3">
+
 <h5>Active Students</h5>
 
-<input type="text" id="searchStudent" class="form-control w-25" placeholder="Search student...">
+<input type="text" id="searchStudent" class="form-control w-25" placeholder="Search student">
+
 </div>
+
+<div class="table-responsive">
 
 <table class="table table-striped" id="studentTable">
 
 <thead>
+
 <tr>
 <th>Name</th>
 <th>Class</th>
 <th>Subject</th>
 <th>Phone</th>
 <th>Fee</th>
-<th>Join</th>
-<th>Actions</th>
+<th>Join Date</th>
+<th>Action</th>
 </tr>
+
 </thead>
 
 <tbody>
@@ -99,19 +116,27 @@
 {% for s in students %}
 
 <tr>
+
 <td>{{s.name}}</td>
+
 <td>{{s.student_class}}</td>
+
 <td>{{s.subject}}</td>
+
 <td>{{s.phone}}</td>
-<td>{{s.monthly_fee}}</td>
+
+<td>₹ {{s.monthly_fee}}</td>
+
 <td>{{s.join_date}}</td>
 
 <td>
 
-<a href="/edit_student/{{s.id}}" class="btn btn-sm btn-warning">Edit</a>
+<form method="POST" action="/leave_student/{{s.id}}" style="display:inline">
 
-<form method="POST" action="/leave_student/{{s.id}}" style="display:inline;">
-<button class="btn btn-sm btn-danger">Leave</button>
+<button class="btn btn-sm btn-danger">
+Leave
+</button>
+
 </form>
 
 </td>
@@ -125,17 +150,26 @@
 </table>
 
 </div>
+
+</div>
 </div>
 
 
+
+<!-- STUDENT HISTORY -->
+
 <div class="card shadow-sm mt-4">
+
 <div class="card-body">
 
-<h5>Student History</h5>
+<h5 class="mb-3">Student History</h5>
+
+<div class="table-responsive">
 
 <table class="table table-bordered">
 
 <thead>
+
 <tr>
 <th>Name</th>
 <th>Class</th>
@@ -143,6 +177,7 @@
 <th>Join Date</th>
 <th>Leave Date</th>
 </tr>
+
 </thead>
 
 <tbody>
@@ -150,11 +185,17 @@
 {% for s in history %}
 
 <tr>
+
 <td>{{s.name}}</td>
+
 <td>{{s.student_class}}</td>
+
 <td>{{s.subject}}</td>
+
 <td>{{s.join_date}}</td>
+
 <td>{{s.leave_date}}</td>
+
 </tr>
 
 {% endfor %}
@@ -164,22 +205,31 @@
 </table>
 
 </div>
+
+</div>
+
 </div>
 
 
+
+<!-- SEARCH SCRIPT -->
+
 <script>
+
 document.getElementById("searchStudent").addEventListener("keyup", function(){
 
-var filter = this.value.toLowerCase();
-var rows = document.querySelectorAll("#studentTable tbody tr");
+var filter = this.value.toLowerCase()
+
+var rows = document.querySelectorAll("#studentTable tbody tr")
 
 rows.forEach(row => {
 
-row.style.display = row.innerText.toLowerCase().includes(filter) ? "" : "none";
+row.style.display = row.innerText.toLowerCase().includes(filter) ? "" : "none"
 
-});
+})
 
-});
+})
+
 </script>
 
 {% endblock %}
