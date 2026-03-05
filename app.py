@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect
 from flask_sqlalchemy import SQLAlchemy
 import os
 from datetime import date
+from sqlalchemy import func
 
 app = Flask(__name__)
 
@@ -81,14 +82,29 @@ with app.app_context():
 @app.route("/")
 def dashboard():
 
-    total_students = Student.query.filter_by(leave_date=None).count()
+    total_students = Student.query.count()
 
-    revenue = db.session.query(db.func.sum(Fee.amount)).scalar() or 0
+    revenue = db.session.query(func.sum(Fee.amount)).scalar() or 0
+
+    pending = db.session.query(func.sum(Student.monthly_fee)).scalar() or 0
+
+    # Student growth (last 6 months simulation)
+    student_growth = [5,10,15,20,25,30]
+
+    # Monthly revenue (last 6 months simulation)
+    revenue_data = [10000,15000,20000,25000,30000,35000]
+
+    # Attendance trend
+    attendance_data = [80,82,85,88,90,92]
 
     return render_template(
         "dashboard.html",
         total_students=total_students,
-        revenue=revenue
+        revenue=revenue,
+        pending=pending,
+        student_growth=student_growth,
+        revenue_data=revenue_data,
+        attendance_data=attendance_data
     )
 
 # =====================
@@ -186,7 +202,6 @@ def attendance():
 
     return render_template("attendance.html", batches=batches)
 
-
 # =====================
 # FEES
 # =====================
@@ -194,7 +209,7 @@ def attendance():
 @app.route("/fees")
 def fees():
 
-    students = Student.query.filter_by(leave_date=None).all()
+    students = Student.query.all()
     fees = Fee.query.all()
 
     return render_template("fees.html", students=students, fees=fees)
@@ -226,7 +241,7 @@ def reports():
     total_teachers = Teacher.query.count()
     total_batches = Batch.query.count()
 
-    revenue = db.session.query(db.func.sum(Fee.amount)).scalar() or 0
+    revenue = db.session.query(func.sum(Fee.amount)).scalar() or 0
 
     return render_template(
         "reports.html",
@@ -235,7 +250,6 @@ def reports():
         total_batches=total_batches,
         revenue=revenue
     )
-
 
 if __name__ == "__main__":
     app.run(debug=True)
