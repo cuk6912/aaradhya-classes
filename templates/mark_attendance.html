@@ -1,0 +1,43 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<h2>Mark Attendance</h2>
+
+<form method="POST" action="/save_attendance/{{batch_id}}">
+
+<table border="1" cellpadding="10">
+
+<tr>
+<th>Name</th>
+<th>Present</th>
+<th>Absent</th>
+</tr>
+
+{% for s in students %}
+
+<tr>
+
+<td>{{s.name}}</td>
+
+<td>
+<input type="radio" name="{{s.id}}" value="Present" checked>
+</td>
+
+<td>
+<input type="radio" name="{{s.id}}" value="Absent">
+</td>
+
+</tr>
+
+{% endfor %}
+
+</table>
+
+<br>
+
+<button>Save Attendance</button>
+
+</form>
+
+{% endblock %}
