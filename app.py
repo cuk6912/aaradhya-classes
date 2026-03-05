@@ -4,13 +4,13 @@ import os
 from datetime import date
 
 app = Flask(__name__)
-app.secret_key = "aaradhya_secret_key"
+app.secret_key = "aaradhya_secret"
 
 # ---------------- DATABASE CONFIG ----------------
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 
-if DATABASE_URL is None:
+if not DATABASE_URL:
     DATABASE_URL = "sqlite:///local.db"
 
 if DATABASE_URL.startswith("postgres://"):
@@ -20,6 +20,7 @@ app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
+
 
 # ---------------- MODELS ----------------
 
@@ -41,20 +42,27 @@ class Student(db.Model):
     leave_date = db.Column(db.String(20))
 
 
-# ---------------- INITIALIZE DATABASE ----------------
+# ---------------- INIT DB ----------------
 
 with app.app_context():
+
     db.create_all()
 
     if not User.query.filter_by(username="admin").first():
-        admin = User(username="admin", password="admin123", role="admin")
+
+        admin = User(
+            username="admin",
+            password="admin123",
+            role="admin"
+        )
+
         db.session.add(admin)
         db.session.commit()
 
 
 # ---------------- LOGIN ----------------
 
-@app.route("/login", methods=["GET", "POST"])
+@app.route("/login", methods=["GET","POST"])
 def login():
 
     if request.method == "POST":
@@ -111,6 +119,7 @@ def dashboard():
 def students():
 
     active_students = Student.query.filter_by(leave_date=None).all()
+
     history_students = Student.query.filter(Student.leave_date != None).all()
 
     return render_template(
@@ -169,9 +178,3 @@ def fees():
 @app.route("/reports")
 def reports():
     return render_template("reports.html")
-
-
-# ---------------- MAIN ----------------
-
-if __name__ == "__main__":
-    app.run()
