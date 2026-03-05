@@ -4,104 +4,44 @@
 
 <h2 class="mb-4">Dashboard</h2>
 
-<div class="row mb-4">
-
-<div class="col-md-3">
-<div class="card shadow-sm">
-<div class="card-body text-center">
-<h6>Total Students</h6>
-<h3>{{total_students}}</h3>
-</div>
-</div>
-</div>
-
-<div class="col-md-3">
-<div class="card shadow-sm">
-<div class="card-body text-center">
-<h6>Monthly Revenue</h6>
-<h3>₹ {{total_revenue}}</h3>
-</div>
-</div>
-</div>
-
-<div class="col-md-3">
-<div class="card shadow-sm">
-<div class="card-body text-center">
-<h6>Classes</h6>
-<h3>{{total_classes}}</h3>
-</div>
-</div>
-</div>
-
-<div class="col-md-3">
-<div class="card shadow-sm">
-<div class="card-body text-center">
-<h6>Subjects</h6>
-<h3>{{total_subjects}}</h3>
-</div>
-</div>
-</div>
-
-</div>
-
-
 <div class="row">
 
-<div class="col-md-6">
-<div class="card shadow-sm">
-<div class="card-body">
-<h5>Revenue Chart</h5>
-<canvas id="revenueChart"></canvas>
-</div>
-</div>
-</div>
+<div class="col-md-4">
 
-<div class="col-md-6">
-<div class="card shadow-sm">
-<div class="card-body">
-<h5>Student Distribution</h5>
-<canvas id="studentChart"></canvas>
-</div>
-</div>
+<div class="card p-4">
+
+<h5>Total Students</h5>
+
+<h2>{{total_students}}</h2>
+
 </div>
 
 </div>
 
+<div class="col-md-4">
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<div class="card p-4">
 
-<script>
+<h5>Total Revenue</h5>
 
-new Chart(
-document.getElementById("revenueChart"),
-{
-type:"bar",
-data:{
-labels:["Revenue"],
-datasets:[{
-label:"Monthly Revenue",
-data:[{{total_revenue}}],
-backgroundColor:"#4e73df"
-}]
-}
-}
-)
+<h2>₹ {{revenue}}</h2>
 
+</div>
 
-new Chart(
-document.getElementById("studentChart"),
-{
-type:"doughnut",
-data:{
-labels:["Students"],
-datasets:[{
-data:[{{total_students}}],
-backgroundColor:["#36b9cc"]
-}]
-}
-}
-)
+</div>
 
-</script>
+<div class="col-md-4">
+
+<div class="card p-4">
+
+<h5>System Status</h5>
+
+<p>Running Successfully</p>
+
+</div>
+
+</div>
+
+</div>
 
 {% endblock %}
