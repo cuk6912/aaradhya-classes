@@ -20,19 +20,26 @@ font-family:Arial;
 transition:0.3s;
 }
 
+/* DARK MODE */
+
 .dark-mode{
 background:#121212;
 color:white;
 }
 
+/* SIDEBAR */
+
 .sidebar{
 width:240px;
 height:100vh;
 position:fixed;
+top:0;
+left:0;
 background:#2c3e50;
 color:white;
 padding-top:20px;
 transition:0.3s;
+z-index:9999;
 }
 
 .sidebar a{
@@ -46,10 +53,14 @@ text-decoration:none;
 background:#34495e;
 }
 
+/* MAIN AREA */
+
 .main{
 margin-left:240px;
 padding:30px;
 }
+
+/* CARDS */
 
 .card{
 border:none;
@@ -57,9 +68,13 @@ border-radius:12px;
 box-shadow:0 2px 10px rgba(0,0,0,0.1);
 }
 
+/* MOBILE MENU */
+
 .mobile-menu{
 display:none;
 }
+
+/* MOBILE FIX */
 
 @media(max-width:768px){
 
@@ -80,6 +95,13 @@ display:block;
 margin-bottom:20px;
 }
 
+}
+
+/* CHART FIX */
+
+canvas{
+position:relative;
+z-index:1;
 }
 
 </style>
@@ -112,7 +134,9 @@ margin-bottom:20px;
 
 <a href="/reports"><i class="fa fa-chart-pie"></i> Reports</a>
 
-<a href="/logout" class="text-danger mt-4"><i class="fa fa-sign-out"></i> Logout</a>
+<a href="/logout" class="text-danger mt-4">
+<i class="fa fa-sign-out"></i> Logout
+</a>
 
 </div>
 
@@ -121,21 +145,16 @@ margin-bottom:20px;
 <div class="mobile-menu">
 
 <button class="btn btn-dark" onclick="toggleMenu()">
-
 <i class="fa fa-bars"></i>
-
 </button>
 
 <button class="btn btn-secondary float-end" onclick="toggleDark()">
-
 <i class="fa fa-moon"></i>
-
 </button>
 
 </div>
 
 {% block content %}
-
 {% endblock %}
 
 </div>
