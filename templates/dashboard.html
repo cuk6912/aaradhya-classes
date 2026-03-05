@@ -4,44 +4,126 @@
 
 <h2 class="mb-4">Dashboard</h2>
 
+<div class="row mb-4">
+
+<div class="col-md-3">
+<div class="card p-3">
+<h6>Total Students</h6>
+<h3>{{total_students}}</h3>
+</div>
+</div>
+
+<div class="col-md-3">
+<div class="card p-3">
+<h6>Total Revenue</h6>
+<h3>₹ {{revenue}}</h3>
+</div>
+</div>
+
+<div class="col-md-3">
+<div class="card p-3">
+<h6>Pending Fees</h6>
+<h3>₹ {{pending}}</h3>
+</div>
+</div>
+
+<div class="col-md-3">
+<div class="card p-3">
+<h6>System Status</h6>
+<h5>Active</h5>
+</div>
+</div>
+
+</div>
+
 <div class="row">
 
-<div class="col-md-4">
+<div class="col-md-6">
+<div class="card p-3">
+<h5>Student Growth</h5>
+<canvas id="studentsChart"></canvas>
+</div>
+</div>
 
-<div class="card p-4">
-
-<h5>Total Students</h5>
-
-<h2>{{total_students}}</h2>
-
+<div class="col-md-6">
+<div class="card p-3">
+<h5>Monthly Revenue</h5>
+<canvas id="revenueChart"></canvas>
+</div>
 </div>
 
 </div>
 
-<div class="col-md-4">
+<div class="row mt-4">
 
-<div class="card p-4">
+<div class="col-md-6">
+<div class="card p-3">
+<h5>Attendance Trend</h5>
+<canvas id="attendanceChart"></canvas>
+</div>
+</div>
 
-<h5>Total Revenue</h5>
-
-<h2>₹ {{revenue}}</h2>
-
+<div class="col-md-6">
+<div class="card p-3">
+<h5>Pending Fees</h5>
+<canvas id="pendingChart"></canvas>
+</div>
 </div>
 
 </div>
 
-<div class="col-md-4">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<div class="card p-4">
+<script>
 
-<h5>System Status</h5>
+new Chart(document.getElementById("studentsChart"), {
+type:"line",
+data:{
+labels:["Jan","Feb","Mar","Apr","May","Jun"],
+datasets:[{
+label:"Students",
+data:{{student_growth}},
+borderColor:"blue",
+fill:false
+}]
+}
+})
 
-<p>Running Successfully</p>
+new Chart(document.getElementById("revenueChart"), {
+type:"bar",
+data:{
+labels:["Jan","Feb","Mar","Apr","May","Jun"],
+datasets:[{
+label:"Revenue",
+data:{{revenue_data}},
+backgroundColor:"green"
+}]
+}
+})
 
-</div>
+new Chart(document.getElementById("attendanceChart"), {
+type:"line",
+data:{
+labels:["Jan","Feb","Mar","Apr","May","Jun"],
+datasets:[{
+label:"Attendance %",
+data:{{attendance_data}},
+borderColor:"orange"
+}]
+}
+})
 
-</div>
+new Chart(document.getElementById("pendingChart"), {
+type:"doughnut",
+data:{
+labels:["Collected","Pending"],
+datasets:[{
+data:[{{revenue}},{{pending}}],
+backgroundColor:["green","red"]
+}]
+}
+})
 
-</div>
+</script>
 
 {% endblock %}
