@@ -26,7 +26,6 @@ db = SQLAlchemy(app)
 # ===============================
 
 class Teacher(db.Model):
-
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100))
     subject = db.Column(db.String(100))
@@ -34,58 +33,39 @@ class Teacher(db.Model):
 
 
 class Batch(db.Model):
-
     id = db.Column(db.Integer, primary_key=True)
-
     batch_name = db.Column(db.String(100))
     class_name = db.Column(db.String(20))
     subject = db.Column(db.String(100))
-
     teacher_id = db.Column(db.Integer)
-
     time = db.Column(db.String(50))
 
 
 class Student(db.Model):
-
     id = db.Column(db.Integer, primary_key=True)
-
     name = db.Column(db.String(100))
     student_class = db.Column(db.String(20))
     subject = db.Column(db.String(100))
-
     phone = db.Column(db.String(20))
-
     monthly_fee = db.Column(db.Integer)
-
     batch_id = db.Column(db.Integer)
-
     join_date = db.Column(db.Date)
     leave_date = db.Column(db.Date)
 
 
 class Attendance(db.Model):
-
     id = db.Column(db.Integer, primary_key=True)
-
     student_id = db.Column(db.Integer)
     batch_id = db.Column(db.Integer)
-
     date = db.Column(db.Date)
-
     status = db.Column(db.String(10))
 
 
 class Fee(db.Model):
-
     id = db.Column(db.Integer, primary_key=True)
-
     student_id = db.Column(db.Integer)
-
     amount = db.Column(db.Integer)
-
     month = db.Column(db.String(20))
-
     payment_date = db.Column(db.Date)
 
 
@@ -93,7 +73,7 @@ with app.app_context():
     db.create_all()
 
 # ===============================
-# DASHBOARD
+# DASHBOARD (SMART FINANCE)
 # ===============================
 
 @app.route("/")
@@ -101,15 +81,20 @@ def dashboard():
 
     total_students = Student.query.filter_by(leave_date=None).count()
 
-    revenue = db.session.query(func.sum(Fee.amount)).scalar() or 0
+    total_revenue = db.session.query(func.sum(Fee.amount)).scalar() or 0
 
-    pending = db.session.query(func.sum(Student.monthly_fee)).scalar() or 0
+    total_monthly_fee = db.session.query(func.sum(Student.monthly_fee)).scalar() or 0
+
+    pending_fees = total_monthly_fee - total_revenue
+
+    overdue_students = Student.query.filter_by(leave_date=None).count() - Fee.query.count()
 
     return render_template(
         "dashboard.html",
         total_students=total_students,
-        revenue=revenue,
-        pending=pending
+        total_revenue=total_revenue,
+        pending_fees=pending_fees,
+        overdue_students=overdue_students
     )
 
 # ===============================
@@ -123,11 +108,7 @@ def students():
 
     history = Student.query.filter(Student.leave_date != None).all()
 
-    return render_template(
-        "students.html",
-        students=students,
-        history=history
-    )
+    return render_template("students.html", students=students, history=history)
 
 
 @app.route("/add_student", methods=["POST"])
@@ -136,31 +117,17 @@ def add_student():
     join_date = request.form.get("join_date")
     leave_date = request.form.get("leave_date")
 
-    join_date_obj = None
-    leave_date_obj = None
-
-    if join_date:
-        join_date_obj = datetime.strptime(join_date, "%Y-%m-%d").date()
-
-    if leave_date:
-        leave_date_obj = datetime.strptime(leave_date, "%Y-%m-%d").date()
+    join_date_obj = datetime.strptime(join_date, "%Y-%m-%d").date() if join_date else None
+    leave_date_obj = datetime.strptime(leave_date, "%Y-%m-%d").date() if leave_date else None
 
     student = Student(
-
         name=request.form["name"],
-
         student_class=request.form["class"],
-
         subject=request.form["subject"],
-
         phone=request.form["phone"],
-
         monthly_fee=request.form["monthly_fee"],
-
         join_date=join_date_obj,
-
         leave_date=leave_date_obj
-
     )
 
     db.session.add(student)
@@ -184,13 +151,9 @@ def teachers():
 def add_teacher():
 
     teacher = Teacher(
-
         name=request.form["name"],
-
         subject=request.form["subject"],
-
         phone=request.form["phone"]
-
     )
 
     db.session.add(teacher)
@@ -206,31 +169,20 @@ def add_teacher():
 def batches():
 
     batches = Batch.query.all()
-
     teachers = Teacher.query.all()
 
-    return render_template(
-        "batches.html",
-        batches=batches,
-        teachers=teachers
-    )
+    return render_template("batches.html", batches=batches, teachers=teachers)
 
 
 @app.route("/add_batch", methods=["POST"])
 def add_batch():
 
     batch = Batch(
-
         batch_name=request.form["batch_name"],
-
         class_name=request.form["class_name"],
-
         subject=request.form["subject"],
-
         teacher_id=request.form["teacher_id"],
-
         time=request.form["time"]
-
     )
 
     db.session.add(batch)
@@ -245,30 +197,20 @@ def add_batch():
 @app.route("/attendance")
 def attendance():
 
+    students = Student.query.filter_by(leave_date=None).all()
     batches = Batch.query.all()
 
-    students = Student.query.filter_by(leave_date=None).all()
-
-    return render_template(
-        "attendance.html",
-        batches=batches,
-        students=students
-    )
+    return render_template("attendance.html", students=students, batches=batches)
 
 
 @app.route("/mark_attendance", methods=["POST"])
 def mark_attendance():
 
     record = Attendance(
-
         student_id=request.form["student_id"],
-
         batch_id=request.form["batch_id"],
-
         date=date.today(),
-
         status=request.form["status"]
-
     )
 
     db.session.add(record)
@@ -284,29 +226,19 @@ def mark_attendance():
 def fees():
 
     students = Student.query.filter_by(leave_date=None).all()
-
     fees = Fee.query.all()
 
-    return render_template(
-        "fees.html",
-        students=students,
-        fees=fees
-    )
+    return render_template("fees.html", students=students, fees=fees)
 
 
 @app.route("/pay_fee", methods=["POST"])
 def pay_fee():
 
     fee = Fee(
-
         student_id=request.form["student_id"],
-
         amount=request.form["amount"],
-
         month=request.form["month"],
-
         payment_date=date.today()
-
     )
 
     db.session.add(fee)
@@ -322,9 +254,7 @@ def pay_fee():
 def reports():
 
     total_students = Student.query.count()
-
     total_teachers = Teacher.query.count()
-
     total_batches = Batch.query.count()
 
     revenue = db.session.query(func.sum(Fee.amount)).scalar() or 0
@@ -379,17 +309,6 @@ def parent_dashboard():
         fees=fees,
         batch=batch
     )
-
-# ===============================
-# LOGOUT
-# ===============================
-
-@app.route("/logout")
-def logout():
-
-    session.clear()
-
-    return redirect("/")
 
 # ===============================
 
