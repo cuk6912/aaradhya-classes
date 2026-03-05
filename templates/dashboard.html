@@ -74,7 +74,7 @@
 
 <div class="card p-4">
 
-<h5>Monthly Revenue</h5>
+<h5>Revenue</h5>
 
 <canvas id="revenueChart"></canvas>
 
@@ -89,20 +89,31 @@
 <script>
 
 new Chart(document.getElementById("studentsChart"),{
+
 type:'line',
+
 data:{
 labels:["Jan","Feb","Mar","Apr","May","Jun"],
 datasets:[{
 label:"Students",
 data:[5,10,15,20,25,30],
 borderColor:"blue",
-fill:false
+tension:0.4
 }]
+},
+
+options:{
+animation:{
+duration:1500
 }
+}
+
 })
 
 new Chart(document.getElementById("revenueChart"),{
+
 type:'bar',
+
 data:{
 labels:["Jan","Feb","Mar","Apr","May","Jun"],
 datasets:[{
@@ -110,7 +121,14 @@ label:"Revenue",
 data:[10000,15000,20000,25000,30000,35000],
 backgroundColor:"green"
 }]
+},
+
+options:{
+animation:{
+duration:1500
 }
+}
+
 })
 
 </script>
