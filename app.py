@@ -1,10 +1,11 @@
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, session
 from flask_sqlalchemy import SQLAlchemy
 import os
 from datetime import date
 from sqlalchemy import func
 
 app = Flask(__name__)
+app.secret_key = "aaradhya_secret"
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 
@@ -76,7 +77,7 @@ with app.app_context():
     db.create_all()
 
 # =====================
-# DASHBOARD
+# ADMIN DASHBOARD
 # =====================
 
 @app.route("/")
@@ -86,25 +87,10 @@ def dashboard():
 
     revenue = db.session.query(func.sum(Fee.amount)).scalar() or 0
 
-    pending = db.session.query(func.sum(Student.monthly_fee)).scalar() or 0
-
-    # Student growth (last 6 months simulation)
-    student_growth = [5,10,15,20,25,30]
-
-    # Monthly revenue (last 6 months simulation)
-    revenue_data = [10000,15000,20000,25000,30000,35000]
-
-    # Attendance trend
-    attendance_data = [80,82,85,88,90,92]
-
     return render_template(
         "dashboard.html",
         total_students=total_students,
-        revenue=revenue,
-        pending=pending,
-        student_growth=student_growth,
-        revenue_data=revenue_data,
-        attendance_data=attendance_data
+        revenue=revenue
     )
 
 # =====================
@@ -137,70 +123,50 @@ def add_student():
     return redirect("/students")
 
 # =====================
-# TEACHERS
+# PARENT LOGIN
 # =====================
 
-@app.route("/teachers")
-def teachers():
+@app.route("/parent-login", methods=["GET","POST"])
+def parent_login():
 
-    teachers = Teacher.query.all()
+    if request.method == "POST":
 
-    return render_template("teachers.html", teachers=teachers)
+        phone = request.form["phone"]
 
+        student = Student.query.filter_by(phone=phone).first()
 
-@app.route("/add_teacher", methods=["POST"])
-def add_teacher():
+        if student:
 
-    teacher = Teacher(
-        name=request.form["name"],
-        subject=request.form["subject"],
-        phone=request.form["phone"]
+            session["parent_student"] = student.id
+
+            return redirect("/parent-dashboard")
+
+    return render_template("parent_login.html")
+
+# =====================
+# PARENT DASHBOARD
+# =====================
+
+@app.route("/parent-dashboard")
+def parent_dashboard():
+
+    student_id = session.get("parent_student")
+
+    student = Student.query.get(student_id)
+
+    attendance = Attendance.query.filter_by(student_id=student_id).all()
+
+    fees = Fee.query.filter_by(student_id=student_id).all()
+
+    batch = Batch.query.get(student.batch_id)
+
+    return render_template(
+        "parent_dashboard.html",
+        student=student,
+        attendance=attendance,
+        fees=fees,
+        batch=batch
     )
-
-    db.session.add(teacher)
-    db.session.commit()
-
-    return redirect("/teachers")
-
-# =====================
-# BATCHES
-# =====================
-
-@app.route("/batches")
-def batches():
-
-    batches = Batch.query.all()
-    teachers = Teacher.query.all()
-
-    return render_template("batches.html", batches=batches, teachers=teachers)
-
-
-@app.route("/add_batch", methods=["POST"])
-def add_batch():
-
-    batch = Batch(
-        batch_name=request.form["batch_name"],
-        class_name=request.form["class_name"],
-        subject=request.form["subject"],
-        teacher_id=request.form["teacher_id"],
-        time=request.form["time"]
-    )
-
-    db.session.add(batch)
-    db.session.commit()
-
-    return redirect("/batches")
-
-# =====================
-# ATTENDANCE
-# =====================
-
-@app.route("/attendance")
-def attendance():
-
-    batches = Batch.query.all()
-
-    return render_template("attendance.html", batches=batches)
 
 # =====================
 # FEES
@@ -210,9 +176,14 @@ def attendance():
 def fees():
 
     students = Student.query.all()
+
     fees = Fee.query.all()
 
-    return render_template("fees.html", students=students, fees=fees)
+    return render_template(
+        "fees.html",
+        students=students,
+        fees=fees
+    )
 
 
 @app.route("/pay_fee", methods=["POST"])
@@ -229,27 +200,6 @@ def pay_fee():
     db.session.commit()
 
     return redirect("/fees")
-
-# =====================
-# REPORTS
-# =====================
-
-@app.route("/reports")
-def reports():
-
-    total_students = Student.query.count()
-    total_teachers = Teacher.query.count()
-    total_batches = Batch.query.count()
-
-    revenue = db.session.query(func.sum(Fee.amount)).scalar() or 0
-
-    return render_template(
-        "reports.html",
-        total_students=total_students,
-        total_teachers=total_teachers,
-        total_batches=total_batches,
-        revenue=revenue
-    )
 
 if __name__ == "__main__":
     app.run(debug=True)
