@@ -178,3 +178,37 @@ def fees():
 @app.route("/reports")
 def reports():
     return render_template("reports.html")
+@app.route("/batches")
+def batches():
+
+    batches = Batch.query.all()
+    teachers = Teacher.query.all()
+
+    return render_template(
+        "batches.html",
+        batches=batches,
+        teachers=teachers
+    )
+
+
+@app.route("/add_batch", methods=["POST"])
+def add_batch():
+
+    batch_name = request.form["batch_name"]
+    class_name = request.form["class_name"]
+    subject = request.form["subject"]
+    teacher_id = request.form["teacher_id"]
+    time = request.form["time"]
+
+    batch = Batch(
+        batch_name=batch_name,
+        class_name=class_name,
+        subject=subject,
+        teacher_id=teacher_id,
+        time=time
+    )
+
+    db.session.add(batch)
+    db.session.commit()
+
+    return redirect("/batches")
