@@ -9,7 +9,7 @@
 <div class="col-md-3">
 <div class="card shadow-sm">
 <div class="card-body text-center">
-<h5>Total Students</h5>
+<h6>Total Students</h6>
 <h3>{{total_students}}</h3>
 </div>
 </div>
@@ -18,7 +18,7 @@
 <div class="col-md-3">
 <div class="card shadow-sm">
 <div class="card-body text-center">
-<h5>Monthly Revenue</h5>
+<h6>Monthly Revenue</h6>
 <h3>₹ {{total_revenue}}</h3>
 </div>
 </div>
@@ -27,7 +27,7 @@
 <div class="col-md-3">
 <div class="card shadow-sm">
 <div class="card-body text-center">
-<h5>Classes</h5>
+<h6>Classes</h6>
 <h3>{{total_classes}}</h3>
 </div>
 </div>
@@ -36,7 +36,7 @@
 <div class="col-md-3">
 <div class="card shadow-sm">
 <div class="card-body text-center">
-<h5>Subjects</h5>
+<h6>Subjects</h6>
 <h3>{{total_subjects}}</h3>
 </div>
 </div>
@@ -72,33 +72,35 @@
 
 <script>
 
-const revenueChart = new Chart(
-document.getElementById('revenueChart'),
+new Chart(
+document.getElementById("revenueChart"),
 {
-type: 'bar',
-data: {
-labels: ['Students'],
-datasets: [{
-label: 'Monthly Revenue',
-data: [{{total_revenue}}],
+type:"bar",
+data:{
+labels:["Revenue"],
+datasets:[{
+label:"Monthly Revenue",
+data:[{{total_revenue}}],
+backgroundColor:"#4e73df"
 }]
 }
 }
-);
+)
 
 
-const studentChart = new Chart(
-document.getElementById('studentChart'),
+new Chart(
+document.getElementById("studentChart"),
 {
-type: 'doughnut',
-data: {
-labels: ['Students'],
-datasets: [{
-data: [{{total_students}}],
+type:"doughnut",
+data:{
+labels:["Students"],
+datasets:[{
+data:[{{total_students}}],
+backgroundColor:["#36b9cc"]
 }]
 }
 }
-);
+)
 
 </script>
 
