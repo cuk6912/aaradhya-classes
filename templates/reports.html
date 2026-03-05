@@ -2,30 +2,58 @@
 
 {% block content %}
 
-<h2>Reports</h2>
+<h2 class="mb-4">Reports</h2>
 
-<table border="1" cellpadding="10">
+<div class="row">
 
-<tr>
-<td>Total Students</td>
-<td>{{total_students}}</td>
-</tr>
+<div class="col-md-3">
 
-<tr>
-<td>Total Teachers</td>
-<td>{{total_teachers}}</td>
-</tr>
+<div class="card p-4">
 
-<tr>
-<td>Total Batches</td>
-<td>{{total_batches}}</td>
-</tr>
+<h6>Total Students</h6>
 
-<tr>
-<td>Total Revenue</td>
-<td>{{revenue}}</td>
-</tr>
+<h3>{{total_students}}</h3>
 
-</table>
+</div>
+
+</div>
+
+<div class="col-md-3">
+
+<div class="card p-4">
+
+<h6>Total Teachers</h6>
+
+<h3>{{total_teachers}}</h3>
+
+</div>
+
+</div>
+
+<div class="col-md-3">
+
+<div class="card p-4">
+
+<h6>Total Batches</h6>
+
+<h3>{{total_batches}}</h3>
+
+</div>
+
+</div>
+
+<div class="col-md-3">
+
+<div class="card p-4">
+
+<h6>Total Revenue</h6>
+
+<h3>₹ {{revenue}}</h3>
+
+</div>
+
+</div>
+
+</div>
 
 {% endblock %}
