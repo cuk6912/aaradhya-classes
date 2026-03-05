@@ -31,5 +31,3 @@ class Student(db.Model):
     join_date = db.Column(db.String(20))
 
     leave_date = db.Column(db.String(20))
-
-    parent_username = db.Column(db.String(50))
