@@ -1,78 +1,51 @@
 from flask import Flask, render_template, request, redirect
 from flask_sqlalchemy import SQLAlchemy
-from datetime import date, datetime
 
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///tuition.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///tuition.db"
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
 
-# -------------------------
-# MODELS
-# -------------------------
+
+# ---------------- MODELS ----------------
 
 class Student(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100))
-    student_class = db.Column(db.String(50))
-    subject = db.Column(db.String(100))
+    student_class = db.Column(db.String(20))
+    subject = db.Column(db.String(50))
     phone = db.Column(db.String(20))
     monthly_fee = db.Column(db.Integer)
-    join_date = db.Column(db.String(20))
-    leave_date = db.Column(db.String(20))
     batch_id = db.Column(db.Integer)
+
 
 class Batch(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100))
-    student_class = db.Column(db.String(50))
-    subject = db.Column(db.String(100))
-    teacher = db.Column(db.String(100))
+    student_class = db.Column(db.String(20))
+    subject = db.Column(db.String(50))
     time = db.Column(db.String(20))
 
-class Attendance(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    student_id = db.Column(db.Integer)
-    date = db.Column(db.String(20))
-    status = db.Column(db.String(10))
 
-class Fee(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    student_id = db.Column(db.Integer)
-    amount = db.Column(db.Integer)
-    month = db.Column(db.String(20))
-    date_paid = db.Column(db.String(20))
-
-
-# -------------------------
-# DASHBOARD
-# -------------------------
+# ---------------- DASHBOARD ----------------
 
 @app.route("/")
 def dashboard():
 
-    students = Student.query.all()
-    total_students = len(students)
-
-    fees = Fee.query.all()
-    revenue = sum([f.amount for f in fees])
-
-    pending = sum([s.monthly_fee for s in students]) - revenue
+    total_students = Student.query.count()
 
     return render_template(
         "dashboard.html",
         total_students=total_students,
-        revenue=revenue,
-        pending=pending,
+        revenue=0,
+        pending=0,
         overdue=0
     )
 
 
-# -------------------------
-# STUDENTS
-# -------------------------
+# ---------------- STUDENTS ----------------
 
 @app.route("/students")
 def students():
@@ -96,8 +69,6 @@ def add_student():
         subject=request.form["subject"],
         phone=request.form["phone"],
         monthly_fee=request.form["fee"],
-        join_date=request.form["join_date"],
-        leave_date=request.form["leave_date"],
         batch_id=request.form["batch"]
     )
 
@@ -107,9 +78,7 @@ def add_student():
     return redirect("/students")
 
 
-# -------------------------
-# BATCHES
-# -------------------------
+# ---------------- BATCHES ----------------
 
 @app.route("/batches")
 def batches():
@@ -126,7 +95,6 @@ def create_batch():
         name=request.form["name"],
         student_class=request.form["class"],
         subject=request.form["subject"],
-        teacher=request.form["teacher"],
         time=request.form["time"]
     )
 
@@ -136,9 +104,7 @@ def create_batch():
     return redirect("/batches")
 
 
-# -------------------------
-# ATTENDANCE
-# -------------------------
+# ---------------- ATTENDANCE ----------------
 
 @app.route("/attendance")
 def attendance():
@@ -148,75 +114,7 @@ def attendance():
     return render_template("attendance.html", batches=batches)
 
 
-@app.route("/mark_attendance/<int:batch_id>")
-def mark_attendance(batch_id):
-
-    students = Student.query.filter_by(batch_id=batch_id).all()
-    today = date.today()
-
-    return render_template(
-        "mark_attendance.html",
-        students=students,
-        today=today
-    )
-
-
-@app.route("/save_attendance", methods=["POST"])
-def save_attendance():
-
-    today = str(date.today())
-
-    for key in request.form:
-
-        if key.startswith("student_"):
-
-            student_id = key.split("_")[1]
-            status = request.form[key]
-
-            record = Attendance(
-                student_id=student_id,
-                date=today,
-                status=status
-            )
-
-            db.session.add(record)
-
-    db.session.commit()
-
-    return redirect("/attendance")
-
-
-# -------------------------
-# FEES
-# -------------------------
-
-@app.route("/fees")
-def fees():
-
-    students = Student.query.all()
-
-    return render_template("fees.html", students=students)
-
-
-@app.route("/pay_fee", methods=["POST"])
-def pay_fee():
-
-    payment = Fee(
-        student_id=request.form["student_id"],
-        amount=request.form["amount"],
-        month=request.form["month"],
-        date_paid=str(datetime.now())
-    )
-
-    db.session.add(payment)
-    db.session.commit()
-
-    return redirect("/fees")
-
-
-# -------------------------
-# REPORTS
-# -------------------------
+# ---------------- REPORTS ----------------
 
 @app.route("/reports")
 def reports():
@@ -226,7 +124,7 @@ def reports():
     return render_template("reports.html", students=students)
 
 
-# -------------------------
+# ---------------- START ----------------
 
 if __name__ == "__main__":
 
