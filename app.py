@@ -1,13 +1,58 @@
 from flask import Flask, render_template, request, redirect
-from models import db, Student, Batch, Attendance, Fee
+from flask_sqlalchemy import SQLAlchemy
+import os
 from datetime import date
 
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///tuition.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+# Railway Postgres connection
+DATABASE_URL = os.environ.get("DATABASE_URL")
 
-db.init_app(app)
+if DATABASE_URL:
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://")
+
+app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL or "sqlite:///tuition.db"
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+db = SQLAlchemy(app)
+
+
+# ---------------- MODELS ----------------
+
+class Student(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100))
+    student_class = db.Column(db.String(50))
+    subject = db.Column(db.String(100))
+    phone = db.Column(db.String(20))
+    monthly_fee = db.Column(db.Integer)
+    join_date = db.Column(db.String(20))
+    leave_date = db.Column(db.String(20))
+    batch_id = db.Column(db.Integer)
+
+
+class Batch(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100))
+    student_class = db.Column(db.String(50))
+    subject = db.Column(db.String(100))
+    teacher = db.Column(db.String(100))
+    time = db.Column(db.String(20))
+
+
+class Attendance(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    student_id = db.Column(db.Integer)
+    date = db.Column(db.String(20))
+    status = db.Column(db.String(10))
+
+
+class Fee(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    student_id = db.Column(db.Integer)
+    amount = db.Column(db.Integer)
+    month = db.Column(db.String(20))
+    date_paid = db.Column(db.String(20))
 
 
 # ---------------- DASHBOARD ----------------
@@ -15,8 +60,7 @@ db.init_app(app)
 @app.route("/")
 def dashboard():
 
-    students = Student.query.filter_by(leave_date="").all()
-    total_students = len(students)
+    total_students = Student.query.count()
 
     fees = Fee.query.all()
     revenue = sum([f.amount for f in fees])
@@ -113,7 +157,8 @@ def mark_attendance(batch_id):
     return render_template(
         "mark_attendance.html",
         students=students,
-        today=today
+        today=today,
+        batch_id=batch_id
     )
 
 
