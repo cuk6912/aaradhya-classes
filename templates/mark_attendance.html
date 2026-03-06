@@ -4,12 +4,12 @@
 
 <h2>Mark Attendance</h2>
 
-<form method="POST" action="/save_attendance/{{batch_id}}">
+<form method="POST" action="/save_attendance">
 
-<table border="1" cellpadding="10">
+<table class="table">
 
 <tr>
-<th>Name</th>
+<th>Student</th>
 <th>Present</th>
 <th>Absent</th>
 </tr>
@@ -17,15 +17,14 @@
 {% for s in students %}
 
 <tr>
-
-<td>{{s.name}}</td>
+<td>{{ s.name }}</td>
 
 <td>
-<input type="radio" name="{{s.id}}" value="Present" checked>
+<input type="radio" name="student_{{ s.id }}" value="Present">
 </td>
 
 <td>
-<input type="radio" name="{{s.id}}" value="Absent">
+<input type="radio" name="student_{{ s.id }}" value="Absent">
 </td>
 
 </tr>
@@ -34,9 +33,7 @@
 
 </table>
 
-<br>
-
-<button>Save Attendance</button>
+<button class="btn btn-success">Save Attendance</button>
 
 </form>
 
