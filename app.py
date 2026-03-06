@@ -5,8 +5,7 @@ from datetime import date
 
 app = Flask(__name__)
 
-# Railway Postgres connection
-DATABASE_URL = os.environ.get("DATABASE_URL")
+DATABASE_URL = os.getenv("DATABASE_URL")
 
 if DATABASE_URL:
     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://")
@@ -16,8 +15,6 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
 
-
-# ---------------- MODELS ----------------
 
 class Student(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -55,8 +52,6 @@ class Fee(db.Model):
     date_paid = db.Column(db.String(20))
 
 
-# ---------------- DASHBOARD ----------------
-
 @app.route("/")
 def dashboard():
 
@@ -74,8 +69,6 @@ def dashboard():
         pending=pending
     )
 
-
-# ---------------- STUDENTS ----------------
 
 @app.route("/students")
 def students():
@@ -110,8 +103,6 @@ def add_student():
     return redirect("/students")
 
 
-# ---------------- BATCHES ----------------
-
 @app.route("/batches")
 def batches():
 
@@ -136,8 +127,6 @@ def create_batch():
 
     return redirect("/batches")
 
-
-# ---------------- ATTENDANCE ----------------
 
 @app.route("/attendance")
 def attendance():
@@ -187,8 +176,6 @@ def save_attendance():
     return redirect("/attendance")
 
 
-# ---------------- REPORTS ----------------
-
 @app.route("/reports")
 def reports():
 
@@ -200,11 +187,9 @@ def reports():
     )
 
 
-# ---------------- START ----------------
-
 if __name__ == "__main__":
 
     with app.app_context():
         db.create_all()
 
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=8080)
