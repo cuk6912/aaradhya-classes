@@ -5,27 +5,27 @@ from datetime import date
 
 app = Flask(__name__)
 
+# ---------------- DATABASE ----------------
+
 DATABASE_URL = os.getenv("DATABASE_URL")
 
 if DATABASE_URL:
     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://")
+else:
+    DATABASE_URL = "sqlite:///tuition.db"
 
-app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL or "sqlite:///tuition.db"
+app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
 
 
-class Student(db.Model):
+# ---------------- MODELS ----------------
+
+class Teacher(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100))
-    student_class = db.Column(db.String(50))
     subject = db.Column(db.String(100))
-    phone = db.Column(db.String(20))
-    monthly_fee = db.Column(db.Integer)
-    join_date = db.Column(db.String(20))
-    leave_date = db.Column(db.String(20))
-    batch_id = db.Column(db.Integer)
 
 
 class Batch(db.Model):
@@ -33,8 +33,19 @@ class Batch(db.Model):
     name = db.Column(db.String(100))
     student_class = db.Column(db.String(50))
     subject = db.Column(db.String(100))
-    teacher = db.Column(db.String(100))
+    teacher_id = db.Column(db.Integer)
     time = db.Column(db.String(20))
+
+
+class Student(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100))
+    student_class = db.Column(db.String(50))
+    phone = db.Column(db.String(20))
+    monthly_fee = db.Column(db.Integer)
+    join_date = db.Column(db.String(20))
+    leave_date = db.Column(db.String(20))
+    batch_id = db.Column(db.Integer)
 
 
 class Attendance(db.Model):
@@ -52,6 +63,14 @@ class Fee(db.Model):
     date_paid = db.Column(db.String(20))
 
 
+# ---------------- CREATE TABLES ----------------
+
+with app.app_context():
+    db.create_all()
+
+
+# ---------------- DASHBOARD ----------------
+
 @app.route("/")
 def dashboard():
 
@@ -60,15 +79,38 @@ def dashboard():
     fees = Fee.query.all()
     revenue = sum([f.amount for f in fees])
 
-    pending = 0
-
     return render_template(
         "dashboard.html",
         total_students=total_students,
-        revenue=revenue,
-        pending=pending
+        revenue=revenue
     )
 
+
+# ---------------- TEACHERS ----------------
+
+@app.route("/teachers")
+def teachers():
+
+    teachers = Teacher.query.all()
+
+    return render_template("teachers.html", teachers=teachers)
+
+
+@app.route("/add_teacher", methods=["POST"])
+def add_teacher():
+
+    teacher = Teacher(
+        name=request.form["name"],
+        subject=request.form["subject"]
+    )
+
+    db.session.add(teacher)
+    db.session.commit()
+
+    return redirect("/teachers")
+
+
+# ---------------- STUDENTS ----------------
 
 @app.route("/students")
 def students():
@@ -89,7 +131,6 @@ def add_student():
     student = Student(
         name=request.form["name"],
         student_class=request.form["class"],
-        subject=request.form["subject"],
         phone=request.form["phone"],
         monthly_fee=request.form["fee"],
         join_date=request.form["join_date"],
@@ -103,12 +144,19 @@ def add_student():
     return redirect("/students")
 
 
+# ---------------- BATCHES ----------------
+
 @app.route("/batches")
 def batches():
 
     batches = Batch.query.all()
+    teachers = Teacher.query.all()
 
-    return render_template("batches.html", batches=batches)
+    return render_template(
+        "batches.html",
+        batches=batches,
+        teachers=teachers
+    )
 
 
 @app.route("/create_batch", methods=["POST"])
@@ -118,7 +166,7 @@ def create_batch():
         name=request.form["name"],
         student_class=request.form["class"],
         subject=request.form["subject"],
-        teacher=request.form["teacher"],
+        teacher_id=request.form["teacher"],
         time=request.form["time"]
     )
 
@@ -127,6 +175,39 @@ def create_batch():
 
     return redirect("/batches")
 
+
+# ---------------- ASSIGN STUDENTS TO BATCH ----------------
+
+@app.route("/batch_students/<int:batch_id>")
+def batch_students(batch_id):
+
+    batch = Batch.query.get(batch_id)
+
+    students = Student.query.filter_by(batch_id=batch_id).all()
+
+    all_students = Student.query.all()
+
+    return render_template(
+        "batch_students.html",
+        batch=batch,
+        students=students,
+        all_students=all_students
+    )
+
+
+@app.route("/assign_student", methods=["POST"])
+def assign_student():
+
+    student = Student.query.get(request.form["student_id"])
+
+    student.batch_id = request.form["batch_id"]
+
+    db.session.commit()
+
+    return redirect(f"/batch_students/{student.batch_id}")
+
+
+# ---------------- ATTENDANCE ----------------
 
 @app.route("/attendance")
 def attendance():
@@ -161,6 +242,7 @@ def save_attendance():
         if key.startswith("student_"):
 
             student_id = key.split("_")[1]
+
             status = request.form[key]
 
             attendance = Attendance(
@@ -176,6 +258,34 @@ def save_attendance():
     return redirect("/attendance")
 
 
+# ---------------- FEES ----------------
+
+@app.route("/fees")
+def fees():
+
+    students = Student.query.all()
+
+    return render_template("fees.html", students=students)
+
+
+@app.route("/pay_fee/<int:student_id>", methods=["POST"])
+def pay_fee(student_id):
+
+    fee = Fee(
+        student_id=student_id,
+        amount=request.form["amount"],
+        month=request.form["month"],
+        date_paid=str(date.today())
+    )
+
+    db.session.add(fee)
+    db.session.commit()
+
+    return redirect("/fees")
+
+
+# ---------------- REPORTS ----------------
+
 @app.route("/reports")
 def reports():
 
@@ -187,8 +297,7 @@ def reports():
     )
 
 
-with app.app_context():
-    db.create_all()
+# ---------------- RUN ----------------
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8080)
