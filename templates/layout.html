@@ -1,71 +1,149 @@
-{% extends "layout.html" %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Aaradhya Classes</title>
 
-{% block content %}
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<h2 class="mb-4">Reports</h2>
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
-<div class="row g-3 mb-4">
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial;
+            transition: 0.3s;
+        }
 
-<div class="col-md-3 col-6">
-<div class="card p-3 text-center">
-<h4>{{students|length}}</h4>
-<p>Total Students</p>
+        /* DARK MODE */
+        body.dark {
+            background: #121212;
+            color: white;
+        }
+
+        body.dark .card {
+            background: #1e1e1e;
+            color: white;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            height: 100vh;
+            width: 250px;
+            position: fixed;
+            background: #2c3e50;
+            overflow-y: auto;
+            transition: 0.3s;
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 12px;
+            color: white;
+            text-decoration: none;
+        }
+
+        .sidebar a:hover {
+            background: #34495e;
+        }
+
+        /* TOP BAR */
+        .topbar {
+            background: #2c3e50;
+            color: white;
+            padding: 10px;
+        }
+
+        /* MAIN CONTENT */
+        .main {
+            margin-left: 250px;
+            padding: 15px;
+        }
+
+        /* MOBILE */
+        .menu-btn {
+            display: none;
+            background: #2c3e50;
+            color: white;
+            border: none;
+            padding: 10px;
+        }
+
+        @media(max-width:768px){
+            .sidebar {
+                left: -250px;
+            }
+
+            .sidebar.active {
+                left: 0;
+            }
+
+            .main {
+                margin-left: 0;
+            }
+
+            .menu-btn {
+                display: block;
+            }
+        }
+    </style>
+</head>
+
+<body id="body">
+
+<!-- TOP BAR -->
+<div class="topbar d-flex justify-content-between align-items-center">
+
+    <button class="menu-btn" onclick="toggleMenu()">☰</button>
+
+    <h5 class="mb-0">Aaradhya Classes</h5>
+
+    <button class="btn btn-sm btn-light" onclick="toggleTheme()">🌙</button>
+
 </div>
+
+<!-- SIDEBAR -->
+<div id="sidebar" class="sidebar">
+
+    <div class="text-center mt-3">
+        <img src="{{ url_for('static', filename='logo.png') }}" width="100">
+    </div>
+
+    <a href="/">Dashboard</a>
+    <a href="/students">Students</a>
+    <a href="/teachers">Teachers</a>
+    <a href="/batches">Batches</a>
+
+    <hr style="color:white">
+
+    <a href="/attendance">Attendance</a>
+    <a href="/student_attendance">Student Attendance</a>
+    <a href="/fees">Fees</a>
+
+    <hr style="color:white">
+
+    <a href="/reports">Reports</a>
+
+    <hr style="color:white">
+
+    <a href="/backup">Backup</a>
+
 </div>
 
-<div class="col-md-3 col-6">
-<div class="card p-3 text-center">
-<h4>{{fees|length}}</h4>
-<p>Total Payments</p>
-</div>
+<!-- MAIN CONTENT -->
+<div class="main">
+    {% block content %}{% endblock %}
 </div>
 
-<div class="col-md-3 col-6">
-<div class="card p-3 text-center">
-<h4>₹{{ fees | sum(attribute='amount') }}</h4>
-<p>Total Revenue</p>
-</div>
-</div>
+<script>
+function toggleMenu(){
+    document.getElementById("sidebar").classList.toggle("active");
+}
 
-<div class="col-md-3 col-6">
-<div class="card p-3 text-center">
-<a href="/student_attendance" class="btn btn-primary">View Attendance</a>
-</div>
-</div>
+function toggleTheme(){
+    document.getElementById("body").classList.toggle("dark");
+}
+</script>
 
-</div>
-
-<h4>Recent Payments</h4>
-
-<table class="table table-striped">
-
-<tr>
-<th>Student</th>
-<th>Amount</th>
-<th>Month</th>
-<th>Date</th>
-</tr>
-
-{% for f in fees %}
-
-<tr>
-
-<td>
-{% for s in students %}
-{% if s.id == f.student_id %}
-{{ s.name }}
-{% endif %}
-{% endfor %}
-</td>
-
-<td>₹{{ f.amount }}</td>
-<td>{{ f.month }}</td>
-<td>{{ f.date_paid }}</td>
-
-</tr>
-
-{% endfor %}
-
-</table>
-
-{% endblock %}
+</body>
+</html>
