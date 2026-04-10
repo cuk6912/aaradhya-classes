@@ -2,19 +2,13 @@ from flask import Flask, render_template, request, redirect
 from flask_sqlalchemy import SQLAlchemy
 import os
 from datetime import date
+import shutil
 
 app = Flask(__name__)
 
-# ---------------- DATABASE CONFIG ----------------
+# ---------------- DATABASE (FINAL STABLE) ----------------
 
-DATABASE_URL = os.getenv("DATABASE_URL")
-
-if DATABASE_URL:
-    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://")
-else:
-    DATABASE_URL = "sqlite:///tuition.db"
-
-app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///tuition.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SECRET_KEY"] = "aaradhya-secret-key"
 
@@ -69,7 +63,7 @@ with app.app_context():
     db.create_all()
 
 
-# ---------------- ROUTES ----------------
+# ---------------- DASHBOARD ----------------
 
 @app.route("/")
 def dashboard():
@@ -81,6 +75,8 @@ def dashboard():
                            total_students=total_students,
                            revenue=revenue)
 
+
+# ---------------- STUDENTS ----------------
 
 @app.route("/students")
 def students():
@@ -100,10 +96,14 @@ def add_student():
         leave_date=request.form["leave_date"],
         batch_id=request.form["batch"]
     )
+
     db.session.add(student)
     db.session.commit()
+
     return redirect("/students")
 
+
+# ---------------- FEES ----------------
 
 @app.route("/fees")
 def fees():
@@ -119,28 +119,22 @@ def pay_fee(student_id):
         month=request.form["month"],
         date_paid=str(date.today())
     )
+
     db.session.add(fee)
     db.session.commit()
+
     return redirect("/fees")
 
 
-# ---------------- BACKUP ROUTE (IMPORTANT) ----------------
+# ---------------- BACKUP SYSTEM (IMPORTANT) ----------------
 
 @app.route("/backup")
 def backup():
-    import datetime
-    filename = f"backup_{datetime.datetime.now().strftime('%Y%m%d')}.txt"
-
-    data = ""
-    students = Student.query.all()
-
-    for s in students:
-        data += f"{s.name},{s.phone},{s.monthly_fee}\\n"
-
-    with open(filename, "w") as f:
-        f.write(data)
-
-    return f"Backup created: {filename}"
+    if os.path.exists("tuition.db"):
+        shutil.copy("tuition.db", "backup.db")
+        return "Backup created successfully"
+    else:
+        return "No database found"
 
 
 # ---------------- RUN ----------------
