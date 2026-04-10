@@ -57,7 +57,7 @@ class Fee(db.Model):
     date_paid = db.Column(db.String(20))
 
 
-# ---------------- CREATE TABLES ----------------
+# ---------------- CREATE TABLE ----------------
 with app.app_context():
     db.create_all()
 
@@ -193,7 +193,11 @@ def save_attendance():
 
 @app.route("/fees")
 def fees():
-    return render_template("fees.html", students=Student.query.all())
+    return render_template(
+        "fees.html",
+        students=Student.query.all(),
+        fees=Fee.query.all()
+    )
 
 
 @app.route("/pay_fee/<int:student_id>", methods=["POST"])
