@@ -7,7 +7,6 @@ import shutil
 app = Flask(__name__)
 
 # ---------------- DATABASE ----------------
-
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///tuition.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SECRET_KEY"] = "aaradhya-secret-key"
@@ -59,7 +58,6 @@ class Fee(db.Model):
 
 
 # ---------------- CREATE TABLES ----------------
-
 with app.app_context():
     db.create_all()
 
@@ -68,16 +66,14 @@ with app.app_context():
 
 @app.route("/")
 def dashboard():
-    total_students = Student.query.count()
-    total_teachers = Teacher.query.count()
-    total_batches = Batch.query.count()
-    revenue = sum([f.amount for f in Fee.query.all()])
-
-    return render_template("dashboard.html",
-                           total_students=total_students,
-                           total_teachers=total_teachers,
-                           total_batches=total_batches,
-                           revenue=revenue)
+    return render_template(
+        "dashboard.html",
+        total_students=Student.query.count(),
+        total_teachers=Teacher.query.count(),
+        total_batches=Batch.query.count(),
+        revenue=sum([f.amount for f in Fee.query.all()]),
+        students=Student.query.order_by(Student.id.desc()).all()
+    )
 
 
 # ---------------- TEACHERS ----------------
@@ -104,7 +100,12 @@ def add_teacher():
 def students():
     students = Student.query.all()
     history = Student.query.filter(Student.leave_date != "").all()
-    return render_template("students.html", students=students, history=history)
+
+    return render_template(
+        "students.html",
+        students=students,
+        history=history
+    )
 
 
 @app.route("/add_student", methods=["POST"])
@@ -119,6 +120,7 @@ def add_student():
         leave_date=request.form.get("leave_date"),
         batch_id=None
     )
+
     db.session.add(s)
     db.session.commit()
     return redirect("/students")
@@ -128,9 +130,11 @@ def add_student():
 
 @app.route("/batches")
 def batches():
-    return render_template("batches.html",
-                           batches=Batch.query.all(),
-                           teachers=Teacher.query.all())
+    return render_template(
+        "batches.html",
+        batches=Batch.query.all(),
+        teachers=Teacher.query.all()
+    )
 
 
 @app.route("/create_batch", methods=["POST"])
@@ -142,6 +146,7 @@ def create_batch():
         teacher_id=request.form.get("teacher"),
         time=request.form.get("time")
     )
+
     db.session.add(b)
     db.session.commit()
     return redirect("/batches")
@@ -157,9 +162,12 @@ def attendance():
 @app.route("/mark_attendance/<int:batch_id>")
 def mark_attendance(batch_id):
     students = Student.query.filter_by(batch_id=batch_id).all()
-    return render_template("mark_attendance.html",
-                           students=students,
-                           batch_id=batch_id)
+
+    return render_template(
+        "mark_attendance.html",
+        students=students,
+        batch_id=batch_id
+    )
 
 
 @app.route("/save_attendance", methods=["POST"])
@@ -196,6 +204,7 @@ def pay_fee(student_id):
         month=request.form.get("month"),
         date_paid=str(date.today())
     )
+
     db.session.add(f)
     db.session.commit()
     return redirect("/fees")
@@ -205,9 +214,11 @@ def pay_fee(student_id):
 
 @app.route("/reports")
 def reports():
-    return render_template("reports.html",
-                           students=Student.query.all(),
-                           fees=Fee.query.all())
+    return render_template(
+        "reports.html",
+        students=Student.query.all(),
+        fees=Fee.query.all()
+    )
 
 
 # ---------------- PARENT LOGIN ----------------
@@ -233,9 +244,11 @@ def parent_dashboard():
     student = Student.query.get(session["parent"])
     fees = Fee.query.filter_by(student_id=student.id).all()
 
-    return render_template("parent_dashboard.html",
-                           student=student,
-                           fees=fees)
+    return render_template(
+        "parent_dashboard.html",
+        student=student,
+        fees=fees
+    )
 
 
 # ---------------- BACKUP ----------------
@@ -244,7 +257,7 @@ def parent_dashboard():
 def backup():
     if os.path.exists("tuition.db"):
         shutil.copy("tuition.db", "backup.db")
-        return "Backup created"
+        return "Backup created successfully"
     return "No database found"
 
 
