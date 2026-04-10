@@ -5,7 +5,7 @@ from datetime import date
 
 app = Flask(__name__)
 
-# ---------------- DATABASE ----------------
+# ---------------- DATABASE CONFIG ----------------
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 
@@ -16,11 +16,10 @@ else:
 
 app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config["SECRET_KEY"] = "aaradhya-secret-key"
 
 db = SQLAlchemy(app)
 
-with app.app_context():
-    db.create_all()
 # ---------------- MODELS ----------------
 
 class Teacher(db.Model):
@@ -64,7 +63,7 @@ class Fee(db.Model):
     date_paid = db.Column(db.String(20))
 
 
-# ---------------- CREATE TABLES ----------------
+# ---------------- CREATE TABLES (IMPORTANT FIX) ----------------
 
 with app.app_context():
     db.create_all()
@@ -74,9 +73,7 @@ with app.app_context():
 
 @app.route("/")
 def dashboard():
-
     total_students = Student.query.count()
-
     fees = Fee.query.all()
     revenue = sum([f.amount for f in fees])
 
@@ -91,23 +88,18 @@ def dashboard():
 
 @app.route("/teachers")
 def teachers():
-
     teachers = Teacher.query.all()
-
     return render_template("teachers.html", teachers=teachers)
 
 
 @app.route("/add_teacher", methods=["POST"])
 def add_teacher():
-
     teacher = Teacher(
         name=request.form["name"],
         subject=request.form["subject"]
     )
-
     db.session.add(teacher)
     db.session.commit()
-
     return redirect("/teachers")
 
 
@@ -115,7 +107,6 @@ def add_teacher():
 
 @app.route("/students")
 def students():
-
     students = Student.query.all()
     batches = Batch.query.all()
 
@@ -128,7 +119,6 @@ def students():
 
 @app.route("/add_student", methods=["POST"])
 def add_student():
-
     student = Student(
         name=request.form["name"],
         student_class=request.form["class"],
@@ -149,7 +139,6 @@ def add_student():
 
 @app.route("/batches")
 def batches():
-
     batches = Batch.query.all()
     teachers = Teacher.query.all()
 
@@ -162,7 +151,6 @@ def batches():
 
 @app.route("/create_batch", methods=["POST"])
 def create_batch():
-
     batch = Batch(
         name=request.form["name"],
         student_class=request.form["class"],
@@ -177,52 +165,17 @@ def create_batch():
     return redirect("/batches")
 
 
-# ---------------- ASSIGN STUDENTS TO BATCH ----------------
-
-@app.route("/batch_students/<int:batch_id>")
-def batch_students(batch_id):
-
-    batch = Batch.query.get(batch_id)
-
-    students = Student.query.filter_by(batch_id=batch_id).all()
-
-    all_students = Student.query.all()
-
-    return render_template(
-        "batch_students.html",
-        batch=batch,
-        students=students,
-        all_students=all_students
-    )
-
-
-@app.route("/assign_student", methods=["POST"])
-def assign_student():
-
-    student = Student.query.get(request.form["student_id"])
-
-    student.batch_id = request.form["batch_id"]
-
-    db.session.commit()
-
-    return redirect(f"/batch_students/{student.batch_id}")
-
-
 # ---------------- ATTENDANCE ----------------
 
 @app.route("/attendance")
 def attendance():
-
     batches = Batch.query.all()
-
     return render_template("attendance.html", batches=batches)
 
 
 @app.route("/mark_attendance/<int:batch_id>")
 def mark_attendance(batch_id):
-
     students = Student.query.filter_by(batch_id=batch_id).all()
-
     today = date.today()
 
     return render_template(
@@ -235,15 +188,11 @@ def mark_attendance(batch_id):
 
 @app.route("/save_attendance", methods=["POST"])
 def save_attendance():
-
     today = str(date.today())
 
     for key in request.form:
-
         if key.startswith("student_"):
-
             student_id = key.split("_")[1]
-
             status = request.form[key]
 
             attendance = Attendance(
@@ -255,7 +204,6 @@ def save_attendance():
             db.session.add(attendance)
 
     db.session.commit()
-
     return redirect("/attendance")
 
 
@@ -263,15 +211,12 @@ def save_attendance():
 
 @app.route("/fees")
 def fees():
-
     students = Student.query.all()
-
     return render_template("fees.html", students=students)
 
 
 @app.route("/pay_fee/<int:student_id>", methods=["POST"])
 def pay_fee(student_id):
-
     fee = Fee(
         student_id=student_id,
         amount=request.form["amount"],
@@ -285,20 +230,7 @@ def pay_fee(student_id):
     return redirect("/fees")
 
 
-# ---------------- REPORTS ----------------
-
-@app.route("/reports")
-def reports():
-
-    students = Student.query.all()
-
-    return render_template(
-        "reports.html",
-        students=students
-    )
-
-
-# ---------------- RUN ----------------
+# ---------------- RUN (RENDER SAFE) ----------------
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8080)
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 10000)))
