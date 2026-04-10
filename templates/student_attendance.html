@@ -1,0 +1,36 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<h2>Student Attendance Report</h2>
+
+<table class="table table-bordered">
+
+<tr>
+<th>Student</th>
+<th>Date</th>
+<th>Status</th>
+</tr>
+
+{% for a in attendance %}
+
+<tr>
+
+<td>
+{% for s in students %}
+{% if s.id == a.student_id %}
+{{ s.name }}
+{% endif %}
+{% endfor %}
+</td>
+
+<td>{{ a.date }}</td>
+<td>{{ a.status }}</td>
+
+</tr>
+
+{% endfor %}
+
+</table>
+
+{% endblock %}
