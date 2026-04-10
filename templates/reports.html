@@ -4,56 +4,68 @@
 
 <h2 class="mb-4">Reports</h2>
 
-<div class="row">
+<div class="row g-3 mb-4">
 
-<div class="col-md-3">
+<div class="col-md-3 col-6">
+<div class="card p-3 text-center">
+<h4>{{students|length}}</h4>
+<p>Total Students</p>
+</div>
+</div>
 
-<div class="card p-4">
+<div class="col-md-3 col-6">
+<div class="card p-3 text-center">
+<h4>{{fees|length}}</h4>
+<p>Total Payments</p>
+</div>
+</div>
 
-<h6>Total Students</h6>
+<div class="col-md-3 col-6">
+<div class="card p-3 text-center">
+<h4>₹{{ fees | sum(attribute='amount') }}</h4>
+<p>Total Revenue</p>
+</div>
+</div>
 
-<h3>{{total_students}}</h3>
-
+<div class="col-md-3 col-6">
+<div class="card p-3 text-center">
+<a href="/student_attendance" class="btn btn-primary">View Attendance</a>
+</div>
 </div>
 
 </div>
 
-<div class="col-md-3">
+<h4>Recent Payments</h4>
 
-<div class="card p-4">
+<table class="table table-striped">
 
-<h6>Total Teachers</h6>
+<tr>
+<th>Student</th>
+<th>Amount</th>
+<th>Month</th>
+<th>Date</th>
+</tr>
 
-<h3>{{total_teachers}}</h3>
+{% for f in fees %}
 
-</div>
+<tr>
 
-</div>
+<td>
+{% for s in students %}
+{% if s.id == f.student_id %}
+{{ s.name }}
+{% endif %}
+{% endfor %}
+</td>
 
-<div class="col-md-3">
+<td>₹{{ f.amount }}</td>
+<td>{{ f.month }}</td>
+<td>{{ f.date_paid }}</td>
 
-<div class="card p-4">
+</tr>
 
-<h6>Total Batches</h6>
+{% endfor %}
 
-<h3>{{total_batches}}</h3>
-
-</div>
-
-</div>
-
-<div class="col-md-3">
-
-<div class="card p-4">
-
-<h6>Total Revenue</h6>
-
-<h3>₹ {{revenue}}</h3>
-
-</div>
-
-</div>
-
-</div>
+</table>
 
 {% endblock %}
