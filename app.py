@@ -5,16 +5,9 @@ from datetime import date
 
 app = Flask(__name__)
 
-# ---------------- DATABASE CONFIG ----------------
+# ---------------- DATABASE CONFIG (FINAL SAFE VERSION) ----------------
 
-DATABASE_URL = os.getenv("DATABASE_URL")
-
-if DATABASE_URL:
-    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://")
-else:
-    DATABASE_URL = "sqlite:///tuition.db"
-
-app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///tuition.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SECRET_KEY"] = "aaradhya-secret-key"
 
@@ -63,7 +56,7 @@ class Fee(db.Model):
     date_paid = db.Column(db.String(20))
 
 
-# ---------------- CREATE TABLES (IMPORTANT FIX) ----------------
+# ---------------- CREATE TABLES ----------------
 
 with app.app_context():
     db.create_all()
