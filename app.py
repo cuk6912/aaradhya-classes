@@ -6,14 +6,14 @@ import shutil
 
 app = Flask(__name__)
 
-# ---------------- DATABASE ----------------
+# DATABASE
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///tuition.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SECRET_KEY"] = "aaradhya-secret-key"
 
 db = SQLAlchemy(app)
 
-# ---------------- MODELS ----------------
+# MODELS
 
 class Teacher(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -57,13 +57,12 @@ class Fee(db.Model):
     date_paid = db.Column(db.String(20))
 
 
-# ---------------- CREATE TABLE ----------------
+# CREATE DB
 with app.app_context():
     db.create_all()
 
 
-# ---------------- DASHBOARD ----------------
-
+# DASHBOARD
 @app.route("/")
 def dashboard():
     return render_template(
@@ -76,8 +75,7 @@ def dashboard():
     )
 
 
-# ---------------- TEACHERS ----------------
-
+# TEACHERS
 @app.route("/teachers")
 def teachers():
     return render_template("teachers.html", teachers=Teacher.query.all())
@@ -85,75 +83,61 @@ def teachers():
 
 @app.route("/add_teacher", methods=["POST"])
 def add_teacher():
-    t = Teacher(
+    db.session.add(Teacher(
         name=request.form.get("name"),
         subject=request.form.get("subject")
-    )
-    db.session.add(t)
+    ))
     db.session.commit()
     return redirect("/teachers")
 
 
-# ---------------- STUDENTS ----------------
-
+# STUDENTS
 @app.route("/students")
 def students():
-    students = Student.query.all()
-    history = Student.query.filter(Student.leave_date != "").all()
-
     return render_template(
         "students.html",
-        students=students,
-        history=history
+        students=Student.query.all(),
+        history=Student.query.filter(Student.leave_date != "").all()
     )
 
 
 @app.route("/add_student", methods=["POST"])
 def add_student():
-    s = Student(
+    db.session.add(Student(
         name=request.form.get("name"),
         student_class=request.form.get("class"),
         subject=request.form.get("subject"),
         phone=request.form.get("phone"),
         monthly_fee=request.form.get("monthly_fee"),
         join_date=request.form.get("join_date"),
-        leave_date=request.form.get("leave_date"),
-        batch_id=None
-    )
-
-    db.session.add(s)
+        leave_date=request.form.get("leave_date")
+    ))
     db.session.commit()
     return redirect("/students")
 
 
-# ---------------- BATCHES ----------------
-
+# BATCHES
 @app.route("/batches")
 def batches():
-    return render_template(
-        "batches.html",
-        batches=Batch.query.all(),
-        teachers=Teacher.query.all()
-    )
+    return render_template("batches.html",
+                           batches=Batch.query.all(),
+                           teachers=Teacher.query.all())
 
 
 @app.route("/create_batch", methods=["POST"])
 def create_batch():
-    b = Batch(
+    db.session.add(Batch(
         name=request.form.get("name"),
         student_class=request.form.get("class"),
         subject=request.form.get("subject"),
         teacher_id=request.form.get("teacher"),
         time=request.form.get("time")
-    )
-
-    db.session.add(b)
+    ))
     db.session.commit()
     return redirect("/batches")
 
 
-# ---------------- ATTENDANCE ----------------
-
+# ATTENDANCE
 @app.route("/attendance")
 def attendance():
     return render_template("attendance.html", batches=Batch.query.all())
@@ -161,111 +145,71 @@ def attendance():
 
 @app.route("/mark_attendance/<int:batch_id>")
 def mark_attendance(batch_id):
-    students = Student.query.filter_by(batch_id=batch_id).all()
-
-    return render_template(
-        "mark_attendance.html",
-        students=students,
-        batch_id=batch_id
-    )
+    return render_template("mark_attendance.html",
+                           students=Student.query.filter_by(batch_id=batch_id).all(),
+                           batch_id=batch_id)
 
 
 @app.route("/save_attendance", methods=["POST"])
 def save_attendance():
     today = str(date.today())
-
     for key in request.form:
         if key.startswith("student_"):
             sid = key.split("_")[1]
-            status = request.form[key]
-
             db.session.add(Attendance(
                 student_id=sid,
                 date=today,
-                status=status
+                status=request.form[key]
             ))
-
     db.session.commit()
     return redirect("/attendance")
 
 
-# ---------------- FEES ----------------
+# STUDENT ATTENDANCE
+@app.route("/student_attendance")
+def student_attendance():
+    return render_template("student_attendance.html",
+                           students=Student.query.all(),
+                           attendance=Attendance.query.all())
 
+
+# FEES
 @app.route("/fees")
 def fees():
-    return render_template(
-        "fees.html",
-        students=Student.query.all(),
-        fees=Fee.query.all()
-    )
+    return render_template("fees.html",
+                           students=Student.query.all(),
+                           fees=Fee.query.all())
 
 
 @app.route("/pay_fee/<int:student_id>", methods=["POST"])
 def pay_fee(student_id):
-    f = Fee(
+    db.session.add(Fee(
         student_id=student_id,
         amount=request.form.get("amount"),
         month=request.form.get("month"),
         date_paid=str(date.today())
-    )
-
-    db.session.add(f)
+    ))
     db.session.commit()
     return redirect("/fees")
 
 
-# ---------------- REPORTS ----------------
-
+# REPORTS
 @app.route("/reports")
 def reports():
-    return render_template(
-        "reports.html",
-        students=Student.query.all(),
-        fees=Fee.query.all()
-    )
+    return render_template("reports.html",
+                           students=Student.query.all(),
+                           fees=Fee.query.all())
 
 
-# ---------------- PARENT LOGIN ----------------
-
-@app.route("/parent_login", methods=["GET", "POST"])
-def parent_login():
-    if request.method == "POST":
-        phone = request.form.get("phone")
-        student = Student.query.filter_by(phone=phone).first()
-
-        if student:
-            session["parent"] = student.id
-            return redirect("/parent_dashboard")
-
-    return render_template("parent_login.html")
-
-
-@app.route("/parent_dashboard")
-def parent_dashboard():
-    if "parent" not in session:
-        return redirect("/parent_login")
-
-    student = Student.query.get(session["parent"])
-    fees = Fee.query.filter_by(student_id=student.id).all()
-
-    return render_template(
-        "parent_dashboard.html",
-        student=student,
-        fees=fees
-    )
-
-
-# ---------------- BACKUP ----------------
-
+# BACKUP
 @app.route("/backup")
 def backup():
     if os.path.exists("tuition.db"):
         shutil.copy("tuition.db", "backup.db")
-        return "Backup created successfully"
+        return "Backup created"
     return "No database found"
 
 
-# ---------------- RUN ----------------
-
+# RUN
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 10000)))
