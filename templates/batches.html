@@ -8,18 +8,16 @@
 
 <h5>Create Batch</h5>
 
-<form method="POST" action="/add_batch">
+<form method="POST" action="/create_batch">
 
-<div class="row">
+<div class="row g-2">
 
 <div class="col-md-3">
-<input class="form-control" name="batch_name" placeholder="Batch Name">
+<input class="form-control" name="name" placeholder="Batch Name" required>
 </div>
 
 <div class="col-md-2">
-
-<select class="form-control" name="class_name">
-
+<select class="form-control" name="class" required>
 <option>1st</option>
 <option>2nd</option>
 <option>3rd</option>
@@ -32,51 +30,37 @@
 <option>10th</option>
 <option>11th</option>
 <option>12th</option>
-
 </select>
-
 </div>
 
 <div class="col-md-2">
-
-<select class="form-control" name="subject">
-
+<select class="form-control" name="subject" required>
 <option>All Subjects</option>
 <option>Maths</option>
 <option>Science</option>
 <option>English</option>
 <option>Phonics</option>
 <option>Abacus</option>
-
 </select>
-
 </div>
 
 <div class="col-md-2">
-
-<select class="form-control" name="teacher_id">
-
+<select class="form-control" name="teacher" required>
 {% for t in teachers %}
-
-<option value="{{t.id}}">
-{{t.name}}
-</option>
-
+<option value="{{t.id}}">{{t.name}}</option>
 {% endfor %}
-
 </select>
-
 </div>
 
 <div class="col-md-2">
+<input class="form-control" name="time" placeholder="5 PM" required>
+</div>
 
-<input class="form-control" name="time" placeholder="5 PM">
-
+<div class="col-md-1">
+<button class="btn btn-success w-100">Add</button>
 </div>
 
 </div>
-
-<button class="btn btn-success mt-3">Create Batch</button>
 
 </form>
 
@@ -86,7 +70,7 @@
 
 <h5>Batch List</h5>
 
-<table class="table">
+<table class="table table-striped">
 
 <tr>
 <th>Batch</th>
@@ -100,8 +84,8 @@
 
 <tr>
 
-<td>{{b.batch_name}}</td>
-<td>{{b.class_name}}</td>
+<td>{{b.name}}</td>
+<td>{{b.student_class}}</td>
 <td>{{b.subject}}</td>
 <td>{{b.teacher_id}}</td>
 <td>{{b.time}}</td>
