@@ -1,26 +1,39 @@
 {% extends "layout.html" %}
 {% block content %}
 
-<h2>Teachers</h2>
+<h2>Batch Management</h2>
 
-<form method="POST" action="/add_teacher">
-<input class="form-control mb-2" name="name" placeholder="Teacher Name" required>
-<input class="form-control mb-2" name="subject" placeholder="Subject" required>
-<button class="btn btn-success">Add Teacher</button>
+<form method="POST" action="/create_batch">
+
+<input name="name" class="form-control mb-2" placeholder="Batch Name" required>
+
+<select name="teacher_id" class="form-control mb-2" required>
+{% for t in teachers %}
+<option value="{{t.id}}">{{t.name}}</option>
+{% endfor %}
+</select>
+
+<button class="btn btn-success">Create</button>
+
 </form>
 
 <hr>
 
 <table class="table">
-<tr><th>Name</th><th>Subject</th></tr>
+<tr><th>Batch</th><th>Teacher</th></tr>
 
-{% for t in teachers %}
+{% for b in batches %}
 <tr>
-<td>{{t.name}}</td>
-<td>{{t.subject}}</td>
+<td>{{b.name}}</td>
+<td>
+{% for t in teachers %}
+{% if t.id == b.teacher_id %}
+{{t.name}}
+{% endif %}
+{% endfor %}
+</td>
 </tr>
 {% endfor %}
-
 </table>
 
 {% endblock %}
