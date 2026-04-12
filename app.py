@@ -1,13 +1,11 @@
-from flask import Flask, render_template, request, redirect, session
+from flask import Flask, render_template, request, redirect
 from flask_sqlalchemy import SQLAlchemy
-import os
 from datetime import date
 
 app = Flask(__name__)
 
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///tuition_final.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.config["SECRET_KEY"] = "secret"
 
 db = SQLAlchemy(app)
 
@@ -42,7 +40,10 @@ with app.app_context():
 # ---------------- DASHBOARD ----------------
 @app.route("/")
 def dashboard():
-    return render_template("dashboard.html")
+    return render_template(
+        "dashboard.html",
+        students=Student.query.all(),   # ✅ FIX
+    )
 
 
 # ---------------- BATCH ----------------
