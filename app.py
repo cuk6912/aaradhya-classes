@@ -19,7 +19,7 @@ class Teacher(db.Model):
 class Batch(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100))
-    teacher_id = db.Column(db.Integer)   # ✅ FIX
+    teacher_id = db.Column(db.Integer)
 
 
 class Student(db.Model):
@@ -34,9 +34,17 @@ class Student(db.Model):
 class Attendance(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     student_id = db.Column(db.Integer)
-    batch_id = db.Column(db.Integer)   # ✅ IMPORTANT
+    batch_id = db.Column(db.Integer)
     date = db.Column(db.String(20))
     status = db.Column(db.String(10))
+
+
+class Fee(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    student_id = db.Column(db.Integer)
+    amount = db.Column(db.Integer)
+    month = db.Column(db.String(20))
+    date_paid = db.Column(db.String(20))
 
 
 # CREATE DB
@@ -47,7 +55,21 @@ with app.app_context():
 # ---------------- DASHBOARD ----------------
 @app.route("/")
 def dashboard():
-    return render_template("dashboard.html")
+    students = Student.query.all()
+    teachers = Teacher.query.all()
+    batches = Batch.query.all()
+    fees = Fee.query.all()
+
+    total_revenue = sum([f.amount for f in fees])
+
+    return render_template(
+        "dashboard.html",
+        students=students,
+        teachers=teachers,
+        batches=batches,
+        fees=fees,
+        revenue=total_revenue
+    )
 
 
 # ---------------- TEACHERS ----------------
@@ -139,7 +161,6 @@ def save_attendance():
     return redirect("/student_attendance")
 
 
-# ---------------- REPORT ----------------
 @app.route("/student_attendance")
 def student_attendance():
     return render_template(
@@ -147,6 +168,28 @@ def student_attendance():
         students=Student.query.all(),
         attendance=Attendance.query.all()
     )
+
+
+# ---------------- FEES ----------------
+@app.route("/fees")
+def fees():
+    return render_template(
+        "fees.html",
+        students=Student.query.all(),
+        fees=Fee.query.all()
+    )
+
+
+@app.route("/pay_fee/<int:student_id>", methods=["POST"])
+def pay_fee(student_id):
+    db.session.add(Fee(
+        student_id=student_id,
+        amount=request.form.get("amount"),
+        month=request.form.get("month"),
+        date_paid=str(date.today())
+    ))
+    db.session.commit()
+    return redirect("/fees")
 
 
 # RUN
