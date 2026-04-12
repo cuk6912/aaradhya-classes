@@ -1,12 +1,9 @@
 {% extends "layout.html" %}
-
 {% block content %}
 
 <h2>Mark Attendance</h2>
 
 <form method="POST" action="/save_attendance">
-
-<input type="hidden" name="batch_id" value="{{batch_id}}">
 
 <table class="table table-bordered">
 
@@ -19,7 +16,6 @@
 {% for s in students %}
 
 <tr>
-
 <td>{{s.name}}</td>
 
 <td>
@@ -36,7 +32,7 @@
 
 </table>
 
-<button class="btn btn-success">Save Attendance</button>
+<button class="btn btn-success">Save</button>
 
 </form>
 
