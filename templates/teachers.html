@@ -1,63 +1,26 @@
 {% extends "layout.html" %}
-
 {% block content %}
 
-<h2 class="mb-4">Teacher Management</h2>
-
-<div class="card p-4 mb-4">
-
-<h5>Add Teacher</h5>
+<h2>Teachers</h2>
 
 <form method="POST" action="/add_teacher">
-
-<div class="row">
-
-<div class="col-md-4">
-<input class="form-control" name="name" placeholder="Teacher Name">
-</div>
-
-<div class="col-md-4">
-<input class="form-control" name="subject" placeholder="Subject">
-</div>
-
-<div class="col-md-4">
-<input class="form-control" name="phone" placeholder="Phone">
-</div>
-
-</div>
-
-<button class="btn btn-primary mt-3">Add Teacher</button>
-
+<input class="form-control mb-2" name="name" placeholder="Teacher Name" required>
+<input class="form-control mb-2" name="subject" placeholder="Subject" required>
+<button class="btn btn-success">Add Teacher</button>
 </form>
 
-</div>
-
-<div class="card p-4">
-
-<h5>Teacher List</h5>
+<hr>
 
 <table class="table">
-
-<tr>
-<th>Name</th>
-<th>Subject</th>
-<th>Phone</th>
-</tr>
+<tr><th>Name</th><th>Subject</th></tr>
 
 {% for t in teachers %}
-
 <tr>
-
 <td>{{t.name}}</td>
 <td>{{t.subject}}</td>
-<td>{{t.phone}}</td>
-
 </tr>
-
 {% endfor %}
 
 </table>
-
-</div>
 
 {% endblock %}
