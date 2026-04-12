@@ -11,6 +11,12 @@ db = SQLAlchemy(app)
 
 # ---------------- MODELS ----------------
 
+class Teacher(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100))
+    subject = db.Column(db.String(100))
+
+
 class Batch(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100))
@@ -32,6 +38,14 @@ class Attendance(db.Model):
     status = db.Column(db.String(10))
 
 
+class Fee(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    student_id = db.Column(db.Integer)
+    amount = db.Column(db.Integer)
+    month = db.Column(db.String(20))
+    date_paid = db.Column(db.String(20))
+
+
 # CREATE DB
 with app.app_context():
     db.create_all()
@@ -42,8 +56,27 @@ with app.app_context():
 def dashboard():
     return render_template(
         "dashboard.html",
-        students=Student.query.all(),   # ✅ FIX
+        students=Student.query.all(),
+        teachers=Teacher.query.all(),
+        batches=Batch.query.all(),
+        fees=Fee.query.all()
     )
+
+
+# ---------------- TEACHERS ----------------
+@app.route("/teachers")
+def teachers():
+    return render_template("teachers.html", teachers=Teacher.query.all())
+
+
+@app.route("/add_teacher", methods=["POST"])
+def add_teacher():
+    db.session.add(Teacher(
+        name=request.form.get("name"),
+        subject=request.form.get("subject")
+    ))
+    db.session.commit()
+    return redirect("/teachers")
 
 
 # ---------------- BATCH ----------------
@@ -113,7 +146,6 @@ def save_attendance():
     return redirect("/student_attendance")
 
 
-# ---------------- REPORT ----------------
 @app.route("/student_attendance")
 def student_attendance():
     return render_template(
@@ -121,6 +153,28 @@ def student_attendance():
         students=Student.query.all(),
         attendance=Attendance.query.all()
     )
+
+
+# ---------------- FEES ----------------
+@app.route("/fees")
+def fees():
+    return render_template(
+        "fees.html",
+        students=Student.query.all(),
+        fees=Fee.query.all()
+    )
+
+
+@app.route("/pay_fee/<int:student_id>", methods=["POST"])
+def pay_fee(student_id):
+    db.session.add(Fee(
+        student_id=student_id,
+        amount=request.form.get("amount"),
+        month=request.form.get("month"),
+        date_paid=str(date.today())
+    ))
+    db.session.commit()
+    return redirect("/fees")
 
 
 # RUN
