@@ -1,10 +1,7 @@
 {% extends "layout.html" %}
-
 {% block content %}
 
-<h2 class="mb-4">Attendance</h2>
-
-<div class="card p-4">
+<h2>Attendance</h2>
 
 <table class="table">
 
@@ -16,25 +13,16 @@
 {% for b in batches %}
 
 <tr>
-
-<td>{{b.batch_name}}</td>
-
+<td>{{b.name}}</td>
 <td>
-
-<a class="btn btn-primary btn-sm" href="/mark_attendance/{{b.id}}">
-
+<a href="/mark_attendance/{{b.id}}" class="btn btn-primary">
 Mark Attendance
-
 </a>
-
 </td>
-
 </tr>
 
 {% endfor %}
 
 </table>
-
-</div>
 
 {% endblock %}
