@@ -5,29 +5,20 @@
 
 <form method="POST" action="/save_attendance">
 
-<table class="table table-bordered">
+<input type="hidden" name="batch_id" value="{{batch_id}}">
 
-<tr>
-<th>Student</th>
-<th>Present</th>
-<th>Absent</th>
-</tr>
+<table class="table">
+
+<tr><th>Student</th><th>Present</th><th>Absent</th></tr>
 
 {% for s in students %}
-
 <tr>
 <td>{{s.name}}</td>
 
-<td>
-<input type="radio" name="student_{{s.id}}" value="Present" required>
-</td>
-
-<td>
-<input type="radio" name="student_{{s.id}}" value="Absent">
-</td>
+<td><input type="radio" name="student_{{s.id}}" value="Present" required></td>
+<td><input type="radio" name="student_{{s.id}}" value="Absent"></td>
 
 </tr>
-
 {% endfor %}
 
 </table>
